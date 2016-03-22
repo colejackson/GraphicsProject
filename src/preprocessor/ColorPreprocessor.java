@@ -12,11 +12,11 @@ public class ColorPreprocessor extends ArrayList<double[]>
 {
 	private static final long serialVersionUID = 7539254017166317833L;
 	
-	private static final double HUE_R = 236.0/255.0;
-	private static final double HUE_G = 240.0/255.0;
-	private static final double HUE_B = 129.0/255.0;
+	private static final double HUE_R = 255.0/255.0;
+	private static final double HUE_G = 190.0/255.0;
+	private static final double HUE_B = 64.0/255.0;
 	
-	private static final double DEGREE_OF_VARIATION = .03;
+	private static final double DEGREE_OF_VARIATION = .06;
 	
 	int currentIndex;
 	int max;

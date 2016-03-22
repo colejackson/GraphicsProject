@@ -76,6 +76,9 @@ public class Stage implements GLEventListener
 		gl.glEnable(GL2.GL_DEPTH_TEST);
 		gl.glDepthFunc(GL2.GL_LESS);
 		
+		// Enable Antialiasing
+		gl.glEnable(GL.GL_LINE_SMOOTH);
+		
 		// Create a Camera and pass in the gl objects.
 		camera = new Camera(glu, gl);
 	}
@@ -138,15 +141,40 @@ public class Stage implements GLEventListener
 				
 				// Draw the first side of the wall.
 				gl.glVertex3d(da[2], da[3], da[5]);
+				
+				gl.glColor3d(cpp.getR() * 1.12, cpp.getG() * 1.12, cpp.getB() * 1.12);
+				
 				gl.glVertex3d(da[2], da[3], da[4]);
 				
 				// Change the color.
-				gl.glColor3d(cpp.getR(), cpp.getG(), cpp.getB());
+				gl.glColor3d(cpp.getR() * 1.12, cpp.getG() * 1.12, cpp.getB() * 1.12);
 				cpp.next();
 				
 				// Draw the second half of the wall.
 				gl.glVertex3d(da[0], da[1], da[4]);
+				
+				gl.glColor3d(cpp.getR(), cpp.getG(), cpp.getB());
+				
 				gl.glVertex3d(da[0], da[1], da[5]);
+				
+				gl.glEnd();
+				
+				gl.glBegin(GL.GL_LINES);
+				
+				gl.glColor3d(cpp.getR() * .9 , cpp.getG() * .9, cpp.getB() * .9);
+				gl.glLineWidth(3.0f);
+				
+				gl.glVertex3d(da[0], da[1], da[4]);
+				gl.glVertex3d(da[2], da[3], da[4]);
+				
+				gl.glVertex3d(da[0], da[1], da[5]);
+				gl.glVertex3d(da[2], da[3], da[5]);
+				
+				gl.glVertex3d(da[0], da[1], da[4]);
+				gl.glVertex3d(da[0], da[1], da[5]);
+				
+				gl.glVertex3d(da[2], da[3], da[4]);
+				gl.glVertex3d(da[2], da[3], da[5]);
 				
 				gl.glEnd();
 			}
