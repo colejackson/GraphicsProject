@@ -11,7 +11,6 @@ import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.gl2.GLUT;
 
-import driver.Utilities;
 import maze.Maze;
 import preprocessor.ColorPreprocessor;
 import preprocessor.MazePreprocessor;
