@@ -135,12 +135,17 @@ public class Camera
 	
 	// Set the initial view factors.
 	private void init() 
-	{
+	{		
+
+
+		
 		// Set the view with frustrum
 		gl.glMatrixMode(GL2.GL_PROJECTION);
 		gl.glLoadIdentity();
 		glu.gluPerspective(100.0, .5, 0.001, 10.0);
 		gl.glMatrixMode(GL2.GL_MODELVIEW);
 		gl.glClearColor(.66f, .88f, 1.0f, 0.0f);
+		
+
 	}	
 }

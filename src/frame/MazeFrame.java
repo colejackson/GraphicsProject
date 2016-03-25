@@ -27,7 +27,7 @@ public final class MazeFrame extends JFrame
 	// Icon for the Program.
 	private final ImageIcon icon = new ImageIcon("resource/icons/icon.png");
 	// Size of the maze in the frame. Number in rows.
-	private final int NUM_OF_ROWS = 40;
+	private final int NUM_OF_ROWS = 35;
 	
 	//Creates a basic, empty frame
 	public MazeFrame()
@@ -66,7 +66,7 @@ public final class MazeFrame extends JFrame
 				this.getContentPane().add(new MenuContent());
 				break;
 			case MAZE_MODE:
-				//Create a maze with 40 rows
+				//Create a maze with specified number of rows
 				Maze maze = new Maze(NUM_OF_ROWS);
 				//Create canvas for the maze to be drawn on
 				Stage stage = new Stage(maze);

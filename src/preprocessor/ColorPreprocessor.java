@@ -1,6 +1,16 @@
 package preprocessor;
 
+import java.awt.image.BufferedImage;
+import java.net.URL;
 import java.util.ArrayList;
+
+import javax.imageio.ImageIO;
+
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLProfile;
+import com.jogamp.opengl.util.awt.ImageUtil;
+import com.jogamp.opengl.util.texture.Texture;
+import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
 
 /*
  * This class represents the array of precomputed colors that we
@@ -16,7 +26,7 @@ public class ColorPreprocessor extends ArrayList<double[]>
 	private static final double HUE_G = 190.0/255.0;
 	private static final double HUE_B = 64.0/255.0;
 	
-	private static final double DEGREE_OF_VARIATION = .06;
+	private static final double DEGREE_OF_VARIATION = .03;
 	
 	int currentIndex;
 	int max;
@@ -48,11 +58,11 @@ public class ColorPreprocessor extends ArrayList<double[]>
 	{
 		double factor = (DEGREE_OF_VARIATION*Math.sin(x*100)*Math.sin(y*100)) + 1;
 		
-		System.out.println(factor);
+		//System.out.println(factor);
 		
 		this.add(new double[] {HUE_R*factor, HUE_G*factor, HUE_B*factor});
 		
-		System.out.println();
+		//System.out.println();
 	}
 	
 	// Return the next color values.
@@ -84,4 +94,5 @@ public class ColorPreprocessor extends ArrayList<double[]>
 	{
 		currentIndex = 0;
 	}
+
 }

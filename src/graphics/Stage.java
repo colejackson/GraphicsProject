@@ -1,5 +1,12 @@
 package graphics;
 
+import java.awt.image.BufferedImage;
+import java.net.URL;
+import javax.imageio.ImageIO;
+import com.jogamp.opengl.util.awt.ImageUtil;
+import com.jogamp.opengl.util.texture.Texture;
+import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
+
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
@@ -32,6 +39,9 @@ public class Stage implements GLEventListener
 	private Director director;
 	private ColorPreprocessor cpp;
 	private MazePreprocessor mpp;
+	
+	Texture texture = null;
+	Texture texture2 = null;
 		
 	// Make a Stage object containing a Maze
 	public Stage(Maze maze)
@@ -81,6 +91,40 @@ public class Stage implements GLEventListener
 		
 		// Create a Camera and pass in the gl objects.
 		camera = new Camera(glu, gl);
+		
+
+		try
+		{
+			//Create a texture object for the ground
+			URL textureURL;
+			textureURL = getClass().getResource("stone.jpg");
+			
+			if (textureURL != null)
+			{
+				BufferedImage img = ImageIO.read(textureURL);
+				ImageUtil.flipImageVertically(img);
+				texture = AWTTextureIO.newTexture(GLProfile.getDefault(), img, true);
+				texture.setTexParameteri(gl, GL2.GL_TEXTURE_WRAP_S, GL2.GL_REPEAT);
+				texture.setTexParameteri(gl, GL2.GL_TEXTURE_WRAP_T, GL2.GL_REPEAT);
+			}
+			
+			//Create a texture object for the walls
+			URL textureURL2;
+			textureURL2 = getClass().getResource("concrete.jpg");
+			
+			if (textureURL2 != null)
+			{
+				BufferedImage img = ImageIO.read(textureURL2);
+				ImageUtil.flipImageVertically(img);
+				texture2 = AWTTextureIO.newTexture(GLProfile.getDefault(), img, true);
+				texture2.setTexParameteri(gl, GL2.GL_TEXTURE_WRAP_S, GL2.GL_REPEAT);
+				texture2.setTexParameteri(gl, GL2.GL_TEXTURE_WRAP_T, GL2.GL_REPEAT);
+			}
+		}	
+		catch(Exception e){
+			e.printStackTrace();
+		}
+
 	}
 
 	@Override
@@ -102,7 +146,7 @@ public class Stage implements GLEventListener
 		for(String s : director)
 			camera.command(s);
 		
-		// Reset the Color Presprocessor;
+		// Reset the Color Preprocessor;
 		cpp.reset();
 	
 		// Render the maze.
@@ -112,19 +156,29 @@ public class Stage implements GLEventListener
 	//Method to draw something on the canvas
 	private void render(GL2 gl)
 	{	
-		// Draw the ground for the maze to sit on.
+		//Enable the ground texture
+		gl.glColor3f(.6f, .6f, .6f);		//will darken the image being drawn
+		//gl.glColor3f(1.0f, 1.0f, 1.0f);	//will lighten the image being drawn
+		texture.enable(gl);
+		texture.bind(gl);
+		
+		// Draw the ground for the maze to sit on. 10x10.
 		gl.glBegin(GL2.GL_POLYGON);
 		
-		// Color light green.
-		gl.glColor3f(.66f, 1.0f, .66f);
-		
-		// Draw a nice big platform 10x10.
-		gl.glVertex2d(-10, 10);
-		gl.glVertex2d(10, 10);
-		gl.glVertex2d(10, -10);
+		gl.glNormal3f(0,0,1);
+		gl.glTexCoord2d(0,0);
 		gl.glVertex2d(-10, -10);
-		
+		gl.glTexCoord2d(225, 0);
+		gl.glVertex2d(10, -10);
+		gl.glTexCoord2d(225, 225);
+		gl.glVertex2d(10, 10);
+		gl.glTexCoord2d(0, 225);
+		gl.glVertex2d(-10, 10);
+
 		gl.glEnd();
+		
+		texture.disable(gl);
+		
 		
 		// "All walls are half the walls", so only draw the first three walls.
 		for(int i = 0; i < 3; i++)
@@ -132,52 +186,57 @@ public class Stage implements GLEventListener
 			// Draw all the values in the preprocessed array.
 			for(double[] da : mpp.get(i))
 			{
+				//Enable the wall texture
+				texture2.enable(gl);
+				texture2.bind(gl);
+				
 				// Draw a single wall.
 				gl.glBegin(GL2.GL_POLYGON);
 				
-				// Set the color in the processor.
-				gl.glColor3d(cpp.getR(), cpp.getG(), cpp.getB());
-				cpp.next();
-				
-				// Draw the first side of the wall.
+				gl.glColor3f(.7f, .7f, .7f);			//darken the image a little
+				gl.glTexCoord2d(0,0);
 				gl.glVertex3d(da[2], da[3], da[5]);
 				
-				gl.glColor3d(cpp.getR() * 1.12, cpp.getG() * 1.12, cpp.getB() * 1.12);
-				
+				gl.glColor3f(1.0f, 1.0f, 1.0f);			//lighten the image a little
+				gl.glTexCoord2d(0,1);
 				gl.glVertex3d(da[2], da[3], da[4]);
 				
-				// Change the color.
-				gl.glColor3d(cpp.getR() * 1.12, cpp.getG() * 1.12, cpp.getB() * 1.12);
-				cpp.next();
-				
-				// Draw the second half of the wall.
+				gl.glColor3f(1.0f, 1.0f, 1.0f);
+				gl.glTexCoord2d(1,1);
 				gl.glVertex3d(da[0], da[1], da[4]);
 				
-				gl.glColor3d(cpp.getR(), cpp.getG(), cpp.getB());
-				
+				gl.glColor3f(.7f, .7f, .7f);			//darken the image a little
+				gl.glTexCoord2d(1,0);
 				gl.glVertex3d(da[0], da[1], da[5]);
 				
 				gl.glEnd();
+
+				texture2.disable(gl);
 				
+				//Outline the walls for more texture
 				gl.glBegin(GL.GL_LINES);
 				
-				gl.glColor3d(cpp.getR() * .9 , cpp.getG() * .9, cpp.getB() * .9);
+				gl.glColor3d(.45,.45,.45);
 				gl.glLineWidth(3.0f);
 				
+				//bottom
 				gl.glVertex3d(da[0], da[1], da[4]);
 				gl.glVertex3d(da[2], da[3], da[4]);
 				
+				//top
 				gl.glVertex3d(da[0], da[1], da[5]);
 				gl.glVertex3d(da[2], da[3], da[5]);
 				
-				gl.glVertex3d(da[0], da[1], da[4]);
-				gl.glVertex3d(da[0], da[1], da[5]);
+				//Side
+				//gl.glVertex3d(da[0], da[1], da[4]);
+				//gl.glVertex3d(da[0], da[1], da[5]);
 				
-				gl.glVertex3d(da[2], da[3], da[4]);
-				gl.glVertex3d(da[2], da[3], da[5]);
+				//Side
+				//gl.glVertex3d(da[2], da[3], da[4]);
+				//gl.glVertex3d(da[2], da[3], da[5]);
 				
-				gl.glEnd();
+				gl.glEnd();	
 			}
-		}	
+		}
 	}
 }
