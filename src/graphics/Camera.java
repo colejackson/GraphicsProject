@@ -2,11 +2,14 @@ package graphics;
 
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
+import java.util.Collection;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.glu.GLU;
 
-public class Camera
+import async.WorkerReady;
+
+public class Camera implements WorkerReady
 {
 	private GL2 gl;
 	private GLU glu;
@@ -169,12 +172,6 @@ public class Camera
 		return new double[] {lookX, lookY, lookZ};
 	}
 	
-	public void setBuffer(ArrayList<double[]> arr)
-	{
-		this.buffer = arr;
-		bufferSet = true;
-	}
-	
 	private boolean willCollide(double x1, double y1, double x2, double y2) 
 	{
 		if(!bufferSet)
@@ -195,5 +192,18 @@ public class Camera
 		
 		return false;
 	}
-	
+
+	@Override
+	public void setBuffer(Object c)
+	{
+		if(c instanceof ArrayList<?>)
+		{
+			this.buffer = (ArrayList<double[]>)c;
+			bufferSet = true;
+		}
+		else
+		{
+			System.err.println("The Buffer Passed to " + this.getClass().toGenericString() + " was not a compatible type.");
+		}
+	}
 }
