@@ -64,7 +64,7 @@ public class MazePreprocessor extends ArrayList<ArrayList<double[]>>
 		
 		ArrayList<double[]> arr = new ArrayList<double[]>();
 		double distance = Math.sqrt(Math.pow(y1-y2, 2) + Math.pow(x1-x2, 2));
-		double wallWidth = .012;
+		double wallWidth = .006;
 			
 		// Find an x and y offset for all the walls.
 		double xo = (Math.abs(y1-y2)/distance)*(wallWidth/2);

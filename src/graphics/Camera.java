@@ -1,12 +1,19 @@
 package graphics;
 
+import java.awt.geom.Line2D;
+import java.util.ArrayList;
+
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.glu.GLU;
 
 public class Camera
 {
-	GL2 gl;
-	GLU glu;
+	private GL2 gl;
+	private GLU glu;
+	private ArrayList<double[]> buffer;
+	private ArrayList<double[]> collision;
+	
+	private boolean bufferSet = false;
 
 	//Position the camera is at
 	private double posX;
@@ -33,6 +40,7 @@ public class Camera
 		// Set the GL variables and initiate the view.
 		this.glu = glu;
 		this.gl = gl;
+		
 		init();
 		
 		// Set initial position
@@ -88,6 +96,9 @@ public class Camera
 		// Make this vector fit the degree we are moving forward (% of the total vector)
 		vecX *= (degree);
 		vecY *= (degree);
+		
+		if(willCollide(posX, posY, posX + (5 * vecX), posY + (5 *vecY)) && posZ < 0.3)
+			return;
 			
 		// Adjust the x values
 		lookX += vecX;
@@ -99,7 +110,7 @@ public class Camera
 		
 		set();
 	}
-	
+
 	// Rotate (Pivot) the camera
 	private void rotate(double d)
 	{
@@ -121,7 +132,9 @@ public class Camera
 		posZ += z;
 		
 		if(posZ <= 0)
-			posZ = 0;
+		{
+			posZ = .01;
+		}
 				
 		set();
 	}
@@ -150,4 +163,37 @@ public class Camera
 	{
 		return new double[] {posX, posY, posZ};
 	}
+	
+	public double[] getLook()
+	{
+		return new double[] {lookX, lookY, lookZ};
+	}
+	
+	public void setBuffer(ArrayList<double[]> arr)
+	{
+		this.buffer = arr;
+		bufferSet = true;
+	}
+	
+	private boolean willCollide(double x1, double y1, double x2, double y2) 
+	{
+		if(!bufferSet)
+			return false;
+		
+		collision = buffer;
+		
+		for(double[] da : collision)
+		{
+			if(da.length < 7)
+			{
+				if(Line2D.linesIntersect(x1, y1, x2, y2, da[0], da[1], da[2], da[3]))
+				{					
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+	
 }

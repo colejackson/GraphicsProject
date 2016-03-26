@@ -1,11 +1,16 @@
 package graphics;
 
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
 import javax.imageio.ImageIO;
-import com.jogamp.opengl.util.awt.ImageUtil;
-import com.jogamp.opengl.util.texture.Texture;
-import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
@@ -16,18 +21,32 @@ import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
+import com.jogamp.opengl.util.awt.ImageUtil;
 import com.jogamp.opengl.util.gl2.GLUT;
+import com.jogamp.opengl.util.texture.Texture;
+import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
 
+import driver.Utilities;
 import maze.Maze;
 import preprocessor.ColorPreprocessor;
 import preprocessor.MazePreprocessor;
 
 public class Stage implements GLEventListener
 {
-	// GL Global Object
+	private boolean newBuffer = false;
+	private boolean bufferConsumed = false;
+	
+	// GL Global Objects
 	private GLProfile profile;
 	private GLCapabilities capabilities;;
 	private GLCanvas canvas;
+	
+	private ArrayList<ArrayList<double[]>> worker = new ArrayList<ArrayList<double[]>>(6);
+	private ArrayList<ArrayList<double[]>> buffer = new ArrayList<ArrayList<double[]>>(6);
+	
+	private ArrayList<double[]> worker_collide = new ArrayList<double[]>();
+	
+	private final boolean running = true;
 	
 	// GL Function Objects
 	GL2 gl;
@@ -53,6 +72,8 @@ public class Stage implements GLEventListener
 		this.mpp = new MazePreprocessor(maze);
 		this.cpp = new ColorPreprocessor(mpp);
 		this.director = new Director();
+		
+		// Initialize the buffer
 				
 		// Configure the canvas, add KeyListener and Request Focus
 		canvas.addGLEventListener(this);
@@ -92,6 +113,34 @@ public class Stage implements GLEventListener
 		// Create a Camera and pass in the gl objects.
 		this.camera = new Camera(glu, gl);
 		
+		// Worker
+		
+		ExecutorService es = Executors.newFixedThreadPool(2);
+		
+		@SuppressWarnings({ "unchecked", "rawtypes", "unused" })
+		final Future f = es.submit(
+			new Callable() 
+			{
+				@Override
+				public Object call() throws Exception 
+				{
+					while(running)
+					{
+						setBuffer();
+						
+						if(!bufferConsumed)
+							Thread.sleep(20);
+						
+						Thread.sleep(50);
+					}
+				}
+			}
+		);
+		
+		buffer = mpp;
+		
+		// End Worker
+		
 		try
 		{
 			//Create a texture object for the ground
@@ -120,7 +169,8 @@ public class Stage implements GLEventListener
 				texture2.setTexParameteri(gl, GL2.GL_TEXTURE_WRAP_T, GL2.GL_REPEAT);
 			}
 		}	
-		catch(Exception e){
+		catch(Exception e)
+		{
 			e.printStackTrace();
 		}
 
@@ -155,6 +205,14 @@ public class Stage implements GLEventListener
 	//Method to draw something on the canvas
 	private void render(GL2 gl)
 	{	
+		// Switch out the buffer if you need to.
+		if(newBuffer)
+		{
+			buffer = worker;
+			bufferConsumed = true;
+			newBuffer = false;		
+		}
+		
 		//Enable the ground texture
 		gl.glColor3f(.6f, .6f, .6f);		//will darken the image being drawn
 		//gl.glColor3f(1.0f, 1.0f, 1.0f);	//will lighten the image being drawn
@@ -178,12 +236,11 @@ public class Stage implements GLEventListener
 		
 		texture.disable(gl);
 		
-		
 		// "All walls are half the walls", so only draw the first three walls.
 		for(int i = 0; i < 3; i++)
 		{
 			// Draw all the values in the preprocessed array.
-			for(double[] da : mpp.get(i))
+			for(double[] da : buffer.get(i))
 			{
 				//Enable the wall texture
 				texture2.enable(gl);
@@ -246,17 +303,55 @@ public class Stage implements GLEventListener
 					gl.glVertex3d(da[0], da[1], da[5]);
 					gl.glVertex3d(da[2], da[3], da[5]);
 					
-					//Side
-					//gl.glVertex3d(da[0], da[1], da[4]);
-					//gl.glVertex3d(da[0], da[1], da[5]);
-					
-					//Side
-					//gl.glVertex3d(da[2], da[3], da[4]);
-					//gl.glVertex3d(da[2], da[3], da[5]);
-					
 					gl.glEnd();	
 				}
 			}
+		}		
+	}
+	
+	protected void setBuffer() 
+	{		
+		worker = new ArrayList<ArrayList<double[]>>();
+		for(int i = 0; i < 6; i++)
+			worker.add(new ArrayList<double[]>());
+		
+		worker_collide = new ArrayList<double[]>();
+		
+		double posx = camera.getPosition()[0];
+		double posy = camera.getPosition()[1];
+		double lookx = camera.getLook()[0];
+		double looky = camera.getLook()[1];
+		
+		double neglookx = posx - lookx;
+		double neglooky = posy - looky;
+		
+		Line2D line1 = new Line2D.Double(posx, posy, lookx, looky);
+		Line2D line2 = new Line2D.Double(posx, posy, neglookx, neglooky);
+						
+		for(int i = 0; i < 3; i++)
+		{			
+			for(int j = 0; j < mpp.get(i).size(); j++)
+			{				
+				double avgx = (mpp.get(i).get(j)[0] + mpp.get(i).get(j)[2])/2.0;
+				double avgy = (mpp.get(i).get(j)[1] + mpp.get(i).get(j)[3])/2.0;
+
+				double distance = Utilities.distance(avgx, avgy, camera.getPosition()[0], camera.getPosition()[1]);
+				
+				if((.5 >= line1.ptLineDist(avgx, avgy) &&
+				   1.4 >= Point2D.distance(posx, posy, avgx, avgy) &&
+				   line1.ptSegDist(avgx, avgy) <= line2.ptSegDist(avgx, avgy)) ||
+				   .1 > Point2D.distance(posx, posy, avgx, avgy))
+				{
+					worker.get(i).add(mpp.get(i).get(j));
+				}
+				if(distance < .05)
+				{
+					worker_collide.add(mpp.get(i).get(j));
+				}
+			}
 		}
+		newBuffer = true;
+		bufferConsumed = false;
+		camera.setBuffer(worker_collide);
 	}
 }
