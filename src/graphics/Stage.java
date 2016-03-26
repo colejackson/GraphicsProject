@@ -50,14 +50,14 @@ public class Stage implements GLEventListener
 		this.profile = GLProfile.getDefault();
 		this.capabilities = new GLCapabilities(profile);
 		this.canvas = new GLCanvas(capabilities);
-		this.director = new Director();
 		this.mpp = new MazePreprocessor(maze);
 		this.cpp = new ColorPreprocessor(mpp);
+		this.director = new Director();
 				
 		// Configure the canvas, add KeyListener and Request Focus
 		canvas.addGLEventListener(this);
-		canvas.addKeyListener(director);
 		canvas.setFocusable(true);
+		canvas.addKeyListener(director);
 		canvas.requestFocus();
 		
 		// Animator stared up, runs display 60x per second.
@@ -90,14 +90,13 @@ public class Stage implements GLEventListener
 		gl.glEnable(GL.GL_LINE_SMOOTH);
 		
 		// Create a Camera and pass in the gl objects.
-		camera = new Camera(glu, gl);
+		this.camera = new Camera(glu, gl);
 		
-
 		try
 		{
 			//Create a texture object for the ground
 			URL textureURL;
-			textureURL = getClass().getResource("stone.jpg");
+			textureURL = getClass().getResource("dirt2.jpg");
 			
 			if (textureURL != null)
 			{
@@ -192,50 +191,71 @@ public class Stage implements GLEventListener
 				
 				// Draw a single wall.
 				gl.glBegin(GL2.GL_POLYGON);
-				
-				gl.glColor3f(.7f, .7f, .7f);			//darken the image a little
-				gl.glTexCoord2d(0,0);
-				gl.glVertex3d(da[2], da[3], da[5]);
-				
-				gl.glColor3f(1.0f, 1.0f, 1.0f);			//lighten the image a little
-				gl.glTexCoord2d(0,1);
-				gl.glVertex3d(da[2], da[3], da[4]);
-				
-				gl.glColor3f(1.0f, 1.0f, 1.0f);
-				gl.glTexCoord2d(1,1);
-				gl.glVertex3d(da[0], da[1], da[4]);
-				
-				gl.glColor3f(.7f, .7f, .7f);			//darken the image a little
-				gl.glTexCoord2d(1,0);
-				gl.glVertex3d(da[0], da[1], da[5]);
+								
+				if(da.length < 7)
+				{
+					gl.glColor3f(.7f, .7f, .7f);			//darken the image a little
+					gl.glTexCoord2d(0,0);
+					gl.glVertex3d(da[2], da[3], da[5]);
+					
+					gl.glColor3f(1.0f, 1.0f, 1.0f);			//lighten the image a little
+					gl.glTexCoord2d(0,1);
+					gl.glVertex3d(da[2], da[3], da[4]);
+					
+					gl.glColor3f(1.0f, 1.0f, 1.0f);
+					gl.glTexCoord2d(1,1);
+					gl.glVertex3d(da[0], da[1], da[4]);
+					
+					gl.glColor3f(.7f, .7f, .7f);			//darken the image a little
+					gl.glTexCoord2d(1,0);
+					gl.glVertex3d(da[0], da[1], da[5]);
+				}
+				else
+				{
+					gl.glColor3f(.7f, .7f, .7f);			//darken the image a little
+					gl.glTexCoord2d(0,0);
+					gl.glVertex3d(da[0], da[1], da[8]);
+					
+					gl.glColor3f(1.0f, 1.0f, 1.0f);			//lighten the image a little
+					gl.glTexCoord2d(0,1);
+					gl.glVertex3d(da[2], da[3], da[8]);
+					
+					gl.glColor3f(1.0f, 1.0f, 1.0f);
+					gl.glTexCoord2d(1,1);
+					gl.glVertex3d(da[4], da[5], da[8]);
+					
+					gl.glColor3f(.7f, .7f, .7f);			//darken the image a little
+					gl.glTexCoord2d(1,0);
+					gl.glVertex3d(da[6], da[7], da[8]);
+				}
 				
 				gl.glEnd();
 
 				texture2.disable(gl);
 				
-				//Outline the walls for more texture
-				gl.glBegin(GL.GL_LINES);
-				
-				gl.glColor3d(.45,.45,.45);
-				gl.glLineWidth(3.0f);
-				
-				//bottom
-				gl.glVertex3d(da[0], da[1], da[4]);
-				gl.glVertex3d(da[2], da[3], da[4]);
-				
-				//top
-				gl.glVertex3d(da[0], da[1], da[5]);
-				gl.glVertex3d(da[2], da[3], da[5]);
-				
-				//Side
-				//gl.glVertex3d(da[0], da[1], da[4]);
-				//gl.glVertex3d(da[0], da[1], da[5]);
-				
-				//Side
-				//gl.glVertex3d(da[2], da[3], da[4]);
-				//gl.glVertex3d(da[2], da[3], da[5]);
-				
-				gl.glEnd();	
+				if(da.length < 7)
+				{
+					//Outline the walls for more texture
+					gl.glBegin(GL.GL_LINES);
+					
+					//bottom
+					gl.glVertex3d(da[0], da[1], da[4]);
+					gl.glVertex3d(da[2], da[3], da[4]);
+					
+					//top
+					gl.glVertex3d(da[0], da[1], da[5]);
+					gl.glVertex3d(da[2], da[3], da[5]);
+					
+					//Side
+					//gl.glVertex3d(da[0], da[1], da[4]);
+					//gl.glVertex3d(da[0], da[1], da[5]);
+					
+					//Side
+					//gl.glVertex3d(da[2], da[3], da[4]);
+					//gl.glVertex3d(da[2], da[3], da[5]);
+					
+					gl.glEnd();	
+				}
 			}
 		}
 	}

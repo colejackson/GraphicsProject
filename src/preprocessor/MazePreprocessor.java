@@ -65,6 +65,7 @@ public class MazePreprocessor extends ArrayList<ArrayList<double[]>>
 		ArrayList<double[]> arr = new ArrayList<double[]>();
 		double distance = Math.sqrt(Math.pow(y1-y2, 2) + Math.pow(x1-x2, 2));
 		double wallWidth = .003;
+		double wallWidth = .012;
 			
 		// Find an x and y offset for all the walls.
 		double xo = (Math.abs(y1-y2)/distance)*(wallWidth/2);
@@ -78,6 +79,7 @@ public class MazePreprocessor extends ArrayList<ArrayList<double[]>>
 			arr.add(new double[] {x1+xo, y1-yo, x1-xo, y1+yo, WALL_BOTTOM, WALL_TOP});
 			arr.add(new double[] {x2+xo, y2-yo, x2-xo, y2+yo, WALL_BOTTOM, WALL_TOP});
 			//arr.add(new double[] {x1-xo, y1+yo, x2+xo, y2-yo, x1-xo, y1+yo, x2+xo, y2-yo, WALL_TOP, WALL_TOP});
+			arr.add(new double[] {x1-xo, y1+yo, x2-xo, y2+yo, x2+xo, y2-yo, x1+xo, y1-yo, WALL_TOP});
 		}
 		else
 		{
@@ -85,7 +87,7 @@ public class MazePreprocessor extends ArrayList<ArrayList<double[]>>
 			arr.add(new double[] {x1-xo, y1-yo, x2-xo, y2-yo, WALL_BOTTOM, WALL_TOP});
 			arr.add(new double[] {x1-xo, y1-yo, x1+xo, y1+yo, WALL_BOTTOM, WALL_TOP});
 			arr.add(new double[] {x2+xo, y2+yo, x2-xo, y2-yo, WALL_BOTTOM, WALL_TOP});
-			//arr.add(new double[] { WALL_TOP, WALL_TOP});
+			arr.add(new double[] {x1+xo, y1+yo, x2+xo, y2+yo, x2-xo, y2-yo, x1-xo, y1-yo, WALL_TOP});
 		}
 		
 		// Return the array you just built.

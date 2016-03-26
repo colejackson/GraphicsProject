@@ -26,7 +26,7 @@ public class Director extends ArrayList<String>implements KeyListener
 	 * When the matching key is depressed, the command should be removed from
 	 * command array.
 	 */
-
+	
 	// LIST OF FINAL COMMANDS
 	private final String MOVE_BACK = "f:-.003";
 	private final String MOVE_FORW = "f:.003";

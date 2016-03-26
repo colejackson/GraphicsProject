@@ -27,7 +27,7 @@ public final class MazeFrame extends JFrame
 	// Icon for the Program.
 	private final ImageIcon icon = new ImageIcon("resource/icons/icon.png");
 	// Size of the maze in the frame. Number in rows.
-	private final int NUM_OF_ROWS = 35;
+	private final int NUM_OF_ROWS = 15;
 	
 	//Creates a basic, empty frame
 	public MazeFrame()
