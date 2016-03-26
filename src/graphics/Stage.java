@@ -59,13 +59,16 @@ public class Stage implements GLEventListener
 	private ColorPreprocessor cpp;
 	private MazePreprocessor mpp;
 	
-	Texture texture = null;
-	Texture texture2 = null;
-		
+	// Texture objects
+	private Texture groundTexture;
+	private Texture wallTexture;
+	private Texture wallTexture1;
+	private Texture wallTexture2;	
+
 	// Make a Stage object containing a Maze
 	public Stage(Maze maze)
 	{
-		// Initialize varuables except camera which requires the GL2 object be initialized first.
+		// Initialize variables except camera which requires the GL2 object be initialized first.
 		this.profile = GLProfile.getDefault();
 		this.capabilities = new GLCapabilities(profile);
 		this.canvas = new GLCanvas(capabilities);
@@ -113,8 +116,13 @@ public class Stage implements GLEventListener
 		// Create a Camera and pass in the gl objects.
 		this.camera = new Camera(glu, gl);
 		
-		// Worker
+		// Create the texture objects
+		groundTexture = createTexture("ImagesGround/grassystone.jpg");
+		wallTexture1 = createTexture("ImagesWall/concrete.jpg");
+		wallTexture2 = createTexture("ImagesWall/metal1light.jpg");
 		
+		
+		// Worker
 		ExecutorService es = Executors.newFixedThreadPool(2);
 		
 		@SuppressWarnings({ "unchecked", "rawtypes", "unused" })
@@ -138,42 +146,7 @@ public class Stage implements GLEventListener
 		);
 		
 		buffer = mpp;
-		
 		// End Worker
-		
-		try
-		{
-			//Create a texture object for the ground
-			URL textureURL;
-			textureURL = getClass().getResource("dirt2.jpg");
-			
-			if (textureURL != null)
-			{
-				BufferedImage img = ImageIO.read(textureURL);
-				ImageUtil.flipImageVertically(img);
-				texture = AWTTextureIO.newTexture(GLProfile.getDefault(), img, true);
-				texture.setTexParameteri(gl, GL2.GL_TEXTURE_WRAP_S, GL2.GL_REPEAT);
-				texture.setTexParameteri(gl, GL2.GL_TEXTURE_WRAP_T, GL2.GL_REPEAT);
-			}
-			
-			//Create a texture object for the walls
-			URL textureURL2;
-			textureURL2 = getClass().getResource("concrete.jpg");
-			
-			if (textureURL2 != null)
-			{
-				BufferedImage img = ImageIO.read(textureURL2);
-				ImageUtil.flipImageVertically(img);
-				texture2 = AWTTextureIO.newTexture(GLProfile.getDefault(), img, true);
-				texture2.setTexParameteri(gl, GL2.GL_TEXTURE_WRAP_S, GL2.GL_REPEAT);
-				texture2.setTexParameteri(gl, GL2.GL_TEXTURE_WRAP_T, GL2.GL_REPEAT);
-			}
-		}	
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-
 	}
 
 	@Override
@@ -215,9 +188,8 @@ public class Stage implements GLEventListener
 		
 		//Enable the ground texture
 		gl.glColor3f(.6f, .6f, .6f);		//will darken the image being drawn
-		//gl.glColor3f(1.0f, 1.0f, 1.0f);	//will lighten the image being drawn
-		texture.enable(gl);
-		texture.bind(gl);
+		groundTexture.enable(gl);
+		groundTexture.bind(gl);
 		
 		// Draw the ground for the maze to sit on. 10x10.
 		gl.glBegin(GL2.GL_POLYGON);
@@ -233,24 +205,38 @@ public class Stage implements GLEventListener
 		gl.glVertex2d(-10, 10);
 
 		gl.glEnd();
+		groundTexture.disable(gl);
 		
-		texture.disable(gl);
 		
+		int counter = 0;
+
 		// "All walls are half the walls", so only draw the first three walls.
 		for(int i = 0; i < 3; i++)
-		{
+		{	
 			// Draw all the values in the preprocessed array.
-			for(double[] da : buffer.get(i))
-			{
-				//Enable the wall texture
-				texture2.enable(gl);
-				texture2.bind(gl);
+			for(double[] da : mpp.get(i))
+			{	
+				if (counter % 5 == 0)
+				{
+					if (counter % 30 == 0)
+					{
+						wallTexture = wallTexture2;
+					}
+					else
+					{
+						wallTexture = wallTexture1;
+					}
+				}
+				
+				wallTexture.enable(gl);
+				wallTexture.bind(gl);
 				
 				// Draw a single wall.
 				gl.glBegin(GL2.GL_POLYGON);
-								
+					
+				//Sides of wall
 				if(da.length < 7)
-				{
+				{	
 					gl.glColor3f(.7f, .7f, .7f);			//darken the image a little
 					gl.glTexCoord2d(0,0);
 					gl.glVertex3d(da[2], da[3], da[5]);
@@ -259,7 +245,6 @@ public class Stage implements GLEventListener
 					gl.glTexCoord2d(0,1);
 					gl.glVertex3d(da[2], da[3], da[4]);
 					
-					gl.glColor3f(1.0f, 1.0f, 1.0f);
 					gl.glTexCoord2d(1,1);
 					gl.glVertex3d(da[0], da[1], da[4]);
 					
@@ -267,6 +252,7 @@ public class Stage implements GLEventListener
 					gl.glTexCoord2d(1,0);
 					gl.glVertex3d(da[0], da[1], da[5]);
 				}
+				//Top of wall
 				else
 				{
 					gl.glColor3f(.7f, .7f, .7f);			//darken the image a little
@@ -276,8 +262,7 @@ public class Stage implements GLEventListener
 					gl.glColor3f(1.0f, 1.0f, 1.0f);			//lighten the image a little
 					gl.glTexCoord2d(0,1);
 					gl.glVertex3d(da[2], da[3], da[8]);
-					
-					gl.glColor3f(1.0f, 1.0f, 1.0f);
+						
 					gl.glTexCoord2d(1,1);
 					gl.glVertex3d(da[4], da[5], da[8]);
 					
@@ -287,26 +272,65 @@ public class Stage implements GLEventListener
 				}
 				
 				gl.glEnd();
-
-				texture2.disable(gl);
 				
-				if(da.length < 7)
-				{
-					//Outline the walls for more texture
-					gl.glBegin(GL.GL_LINES);
+//				//If a side of a wall (AKA not the top)
+//				if(da.length < 7)
+//				{
+//					//Outline the walls for more texture
+//					if (wallTexture == wallTexture2)
+//						gl.glColor3f(.4f, .4f, .4f);
+//					else
+//						gl.glColor3f(.6f, .6f, .6f);
+//					
+//					gl.glLineWidth(2.0f);
+//					gl.glBegin(GL.GL_LINES);
+//					
+//					//bottom
+//					gl.glVertex3d(da[0], da[1], da[4]);
+//					gl.glVertex3d(da[2], da[3], da[4]);
+//					
+//					//top
+//					gl.glVertex3d(da[0], da[1], da[5]);
+//					gl.glVertex3d(da[2], da[3], da[5]);
+//					
+//					//Side
+//					//gl.glVertex3d(da[0], da[1], da[4]);
+//					//gl.glVertex3d(da[0], da[1], da[5]);
+//					
+//					//Side
+//					//gl.glVertex3d(da[2], da[3], da[4]);
+//					//gl.glVertex3d(da[2], da[3], da[5]);
+//					
+//					gl.glEnd();	
+//				}
 					
-					//bottom
-					gl.glVertex3d(da[0], da[1], da[4]);
-					gl.glVertex3d(da[2], da[3], da[4]);
-					
-					//top
-					gl.glVertex3d(da[0], da[1], da[5]);
-					gl.glVertex3d(da[2], da[3], da[5]);
-					
-					gl.glEnd();	
-				}
+				++counter;
 			}
-		}		
+		}
+		wallTexture.disable(gl);
+	}
+	
+	private Texture createTexture(String imagePath)
+	{
+		Texture texture = null;
+		try
+		{
+			URL textureURL;
+			textureURL = getClass().getResource(imagePath);
+			
+			if (textureURL != null)
+			{
+				BufferedImage img = ImageIO.read(textureURL);
+				ImageUtil.flipImageVertically(img);
+				texture = AWTTextureIO.newTexture(GLProfile.getDefault(), img, true);
+				texture.setTexParameteri(gl, GL2.GL_TEXTURE_WRAP_S, GL2.GL_REPEAT);
+				texture.setTexParameteri(gl, GL2.GL_TEXTURE_WRAP_T, GL2.GL_REPEAT);
+			}
+		}	
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		return texture;
 	}
 	
 	protected void setBuffer() 
