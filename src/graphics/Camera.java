@@ -100,8 +100,10 @@ public class Camera implements WorkerReady
 		vecX *= (degree);
 		vecY *= (degree);
 		
-		if(willCollide(posX, posY, posX + (5 * vecX), posY + (5 *vecY)) && posZ < 0.3)
+		if(willCollide(posX, posY, posX + (5 * vecX), posY + (5 * vecY)) && posZ < 0.3)
+		{
 			return;
+		}
 			
 		// Adjust the x values
 		lookX += vecX;
@@ -194,7 +196,7 @@ public class Camera implements WorkerReady
 	}
 
 	@Override
-	public void setBuffer(Object c)
+	public void setBuffer(Collection<?> c)
 	{
 		if(c instanceof ArrayList<?>)
 		{

@@ -1,12 +1,9 @@
-package preprocessor;
+package maze;
 
 import java.util.ArrayList;
 
-import maze.Maze;
-import maze.MazePoint;
-
 // This arraylist processes the positions of maze walls.
-public class MazePreprocessor extends ArrayList<ArrayList<double[]>> 
+public class WallPreprocessor extends ArrayList<ArrayList<double[]>> 
 {
 	private static final long serialVersionUID = 4266007871842632293L;
 	
@@ -17,7 +14,7 @@ public class MazePreprocessor extends ArrayList<ArrayList<double[]>>
 	private Maze maze;
 	
 	// Start the processor.
-	public MazePreprocessor(Maze maze)
+	public WallPreprocessor(Maze maze)
 	{
 		this.maze = maze;
 		processMaze();		

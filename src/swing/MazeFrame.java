@@ -1,4 +1,4 @@
-package frame;
+package swing;
 
 import java.awt.Dimension;
 
@@ -8,8 +8,6 @@ import javax.swing.JFrame;
 import driver.Utilities;
 import graphics.Stage;
 import maze.Maze;
-import menu.MazeBar;
-import menu.MenuContent;
 
 // The JFrame object that will hold our project.
 public final class MazeFrame extends JFrame 
@@ -27,7 +25,7 @@ public final class MazeFrame extends JFrame
 	// Icon for the Program.
 	private final ImageIcon icon = new ImageIcon("resource/icons/icon.png");
 	// Size of the maze in the frame. Number in rows.
-	private final int NUM_OF_ROWS = 30;
+	private final int NUM_OF_ROWS = 35;
 	
 	//Creates a basic, empty frame
 	public MazeFrame()

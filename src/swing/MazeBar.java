@@ -1,4 +1,4 @@
-package menu;
+package swing;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;

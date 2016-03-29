@@ -4,5 +4,5 @@ import java.util.Collection;
 
 public interface WorkerReady 
 {	
-	public void setBuffer(Object c);
+	public void setBuffer(Collection<?> c);
 }

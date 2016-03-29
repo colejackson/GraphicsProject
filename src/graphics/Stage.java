@@ -26,10 +26,11 @@ import com.jogamp.opengl.util.gl2.GLUT;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
 
+import async.Director;
 import driver.Utilities;
 import maze.Maze;
-import preprocessor.ColorPreprocessor;
-import preprocessor.MazePreprocessor;
+import maze.WallPreprocessor;
+import z_deprecated.ColorPreprocessor;
 
 public class Stage implements GLEventListener
 {
@@ -57,7 +58,7 @@ public class Stage implements GLEventListener
 	private Camera camera;
 	private Director director;
 	private ColorPreprocessor cpp;
-	private MazePreprocessor mpp;
+	private WallPreprocessor mpp;
 	
 	// Texture objects
 	private Texture groundTexture;
@@ -72,12 +73,10 @@ public class Stage implements GLEventListener
 		this.profile = GLProfile.getDefault();
 		this.capabilities = new GLCapabilities(profile);
 		this.canvas = new GLCanvas(capabilities);
-		this.mpp = new MazePreprocessor(maze);
+		this.mpp = new WallPreprocessor(maze);
 		this.cpp = new ColorPreprocessor(mpp);
 		this.director = new Director();
-		
-		// Initialize the buffer
-				
+						
 		// Configure the canvas, add KeyListener and Request Focus
 		canvas.addGLEventListener(this);
 		canvas.setFocusable(true);
@@ -186,128 +185,8 @@ public class Stage implements GLEventListener
 			newBuffer = false;		
 		}
 		
-		//Enable the ground texture
-		gl.glColor3f(.6f, .6f, .6f);		//will darken the image being drawn
-		groundTexture.enable(gl);
-		groundTexture.bind(gl);
-		
-		// Draw the ground for the maze to sit on. 10x10.
-		gl.glBegin(GL2.GL_POLYGON);
-		
-		gl.glNormal3f(0,0,1);
-		gl.glTexCoord2d(0,0);
-		gl.glVertex2d(-10, -10);
-		gl.glTexCoord2d(225, 0);
-		gl.glVertex2d(10, -10);
-		gl.glTexCoord2d(225, 225);
-		gl.glVertex2d(10, 10);
-		gl.glTexCoord2d(0, 225);
-		gl.glVertex2d(-10, 10);
-
-		gl.glEnd();
-		groundTexture.disable(gl);
-		
-		
-		int counter = 0;
-
-		// "All walls are half the walls", so only draw the first three walls.
-		for(int i = 0; i < 3; i++)
-		{	
-			// Draw all the values in the preprocessed array.
-			for(double[] da : mpp.get(i))
-			{	
-				if (counter % 5 == 0)
-				{
-					if (counter % 30 == 0)
-					{
-						wallTexture = wallTexture2;
-					}
-					else
-					{
-						wallTexture = wallTexture1;
-					}
-				}
-				
-				wallTexture.enable(gl);
-				wallTexture.bind(gl);
-				
-				// Draw a single wall.
-				gl.glBegin(GL2.GL_POLYGON);
-					
-				//Sides of wall
-				if(da.length < 7)
-				{	
-					gl.glColor3f(.7f, .7f, .7f);			//darken the image a little
-					gl.glTexCoord2d(0,0);
-					gl.glVertex3d(da[2], da[3], da[5]);
-					
-					gl.glColor3f(1.0f, 1.0f, 1.0f);			//lighten the image a little
-					gl.glTexCoord2d(0,1);
-					gl.glVertex3d(da[2], da[3], da[4]);
-					
-					gl.glTexCoord2d(1,1);
-					gl.glVertex3d(da[0], da[1], da[4]);
-					
-					gl.glColor3f(.7f, .7f, .7f);			//darken the image a little
-					gl.glTexCoord2d(1,0);
-					gl.glVertex3d(da[0], da[1], da[5]);
-				}
-				//Top of wall
-				else
-				{
-					gl.glColor3f(.7f, .7f, .7f);			//darken the image a little
-					gl.glTexCoord2d(0,0);
-					gl.glVertex3d(da[0], da[1], da[8]);
-					
-					gl.glColor3f(1.0f, 1.0f, 1.0f);			//lighten the image a little
-					gl.glTexCoord2d(0,1);
-					gl.glVertex3d(da[2], da[3], da[8]);
-						
-					gl.glTexCoord2d(1,1);
-					gl.glVertex3d(da[4], da[5], da[8]);
-					
-					gl.glColor3f(.7f, .7f, .7f);			//darken the image a little
-					gl.glTexCoord2d(1,0);
-					gl.glVertex3d(da[6], da[7], da[8]);
-				}
-				
-				gl.glEnd();
-				
-//				//If a side of a wall (AKA not the top)
-//				if(da.length < 7)
-//				{
-//					//Outline the walls for more texture
-//					if (wallTexture == wallTexture2)
-//						gl.glColor3f(.4f, .4f, .4f);
-//					else
-//						gl.glColor3f(.6f, .6f, .6f);
-//					
-//					gl.glLineWidth(2.0f);
-//					gl.glBegin(GL.GL_LINES);
-//					
-//					//bottom
-//					gl.glVertex3d(da[0], da[1], da[4]);
-//					gl.glVertex3d(da[2], da[3], da[4]);
-//					
-//					//top
-//					gl.glVertex3d(da[0], da[1], da[5]);
-//					gl.glVertex3d(da[2], da[3], da[5]);
-//					
-//					//Side
-//					//gl.glVertex3d(da[0], da[1], da[4]);
-//					//gl.glVertex3d(da[0], da[1], da[5]);
-//					
-//					//Side
-//					//gl.glVertex3d(da[2], da[3], da[4]);
-//					//gl.glVertex3d(da[2], da[3], da[5]);
-//					
-//					gl.glEnd();	
-//				}
-					
-				++counter;
-			}
-		}
-		wallTexture.disable(gl);
+		Scenery.drawGround(gl, groundTexture);		
+		Scenery.drawWalls(gl, buffer, wallTexture1, wallTexture1);
 	}
 	
 	private Texture createTexture(String imagePath)
