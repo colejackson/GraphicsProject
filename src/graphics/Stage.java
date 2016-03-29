@@ -308,6 +308,54 @@ public class Stage implements GLEventListener
 			}
 		}
 		wallTexture.disable(gl);
+		
+		gl.glEnable(GL.GL_BLEND);
+		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+
+		gl.glBegin(gl.GL_QUADS);
+		
+		gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		gl.glColor4f(0.0f, 0.0f, 0.0f, 0.4f);
+	
+		
+		double[] where = camera.getLook();
+		double[] pos = camera.getPosition();
+
+		
+		gl.glVertex3d(pos[0] + 0.003, pos[1] + 0.002, where[2] - 0.15);
+		gl.glVertex3d(pos[0] - 0.003, pos[1] + 0.002, where[2] - 0.15);
+		gl.glVertex3d(pos[0] - 0.003, pos[1] + 0.002, where[2] + 0.15);
+		gl.glVertex3d(pos[0] + 0.003, pos[1] + 0.002, where[2] + 0.15);
+		
+		gl.glVertex3d(pos[0] + 0.003, pos[1] - 0.002, where[2] - 0.15);
+		gl.glVertex3d(pos[0] - 0.003, pos[1] - 0.002, where[2] - 0.15);
+		gl.glVertex3d(pos[0] - 0.003, pos[1] - 0.002, where[2] + 0.15);
+		gl.glVertex3d(pos[0] + 0.003, pos[1] - 0.002, where[2] + 0.15);
+		
+		gl.glVertex3d(pos[0] + 0.003, pos[1] + 0.002, where[2] + 0.15);
+		gl.glVertex3d(pos[0] - 0.003, pos[1] + 0.002, where[2] + 0.15);
+		gl.glVertex3d(pos[0] - 0.003, pos[1] - 0.002, where[2] + 0.15);
+		gl.glVertex3d(pos[0] + 0.003, pos[1] - 0.002, where[2] + 0.15);
+		
+		gl.glVertex3d(pos[0] - 0.003, pos[1] - 0.002, where[2] - 0.15);
+		gl.glVertex3d(pos[0] + 0.003, pos[1] - 0.002, where[2] - 0.15);
+		gl.glVertex3d(pos[0] + 0.003, pos[1] + 0.002, where[2] - 0.15);
+		gl.glVertex3d(pos[0] - 0.003, pos[1] + 0.002, where[2] - 0.15);
+		
+		gl.glVertex3d(pos[0] - 0.003, pos[1] + 0.002, where[2] + 0.15);
+		gl.glVertex3d(pos[0] - 0.003, pos[1] + 0.002, where[2] - 0.15);
+		gl.glVertex3d(pos[0] - 0.003, pos[1] - 0.002, where[2] - 0.15);
+		gl.glVertex3d(pos[0] - 0.003, pos[1] - 0.002, where[2] + 0.15);
+		
+		gl.glVertex3d(pos[0] + 0.003, pos[1] + 0.002, where[2] - 0.15);
+		gl.glVertex3d(pos[0] + 0.003, pos[1] + 0.002, where[2] + 0.15);
+		gl.glVertex3d(pos[0] + 0.003, pos[1] - 0.002, where[2] + 0.15);
+		gl.glVertex3d(pos[0] + 0.003, pos[1] - 0.002, where[2] - 0.15);
+		
+		
+		gl.glEnd();
+
+		gl.glDisable(GL.GL_BLEND);
 	}
 	
 	private Texture createTexture(String imagePath)
