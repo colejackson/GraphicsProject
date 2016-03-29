@@ -116,9 +116,9 @@ public class Stage implements GLEventListener
 		this.camera = new Camera(glu, gl);
 		
 		// Create the texture objects
-		groundTexture = createTexture("ImagesGround/grassystone.jpg");
-		wallTexture1 = createTexture("ImagesWall/concrete.jpg");
-		wallTexture2 = createTexture("ImagesWall/metal1light.jpg");
+		groundTexture = createTexture("grassystone.jpg");
+		wallTexture1 = createTexture("concrete.jpg");
+		wallTexture2 = createTexture("metal1light.jpg");
 		
 		
 		// Worker
