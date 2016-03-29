@@ -37,6 +37,8 @@ public class Camera implements WorkerReady
 	private double radius = 0;
 	private double degree = 30;
 	
+	private float alpha = 0f;
+	
 	//Creates a camera object
 	public Camera(GLU glu, GL2 gl)
 	{	
@@ -87,6 +89,22 @@ public class Camera implements WorkerReady
 		{
 			rotate(Double.parseDouble(commands[1]));
 		}
+		else if(commands[0].equals("a"))
+		{
+			adjustAlpha(Double.parseDouble(commands[1]));
+		}
+	}
+	
+	private void adjustAlpha(double degree)
+	{
+		System.out.println(alpha += (float)degree);
+		
+		if((double)alpha + degree > 1)
+			alpha = 1.0f;
+		else if((double)alpha + degree < 0)
+			alpha = 0.0f;
+		else
+			alpha += (float)degree;
 	}
 	
 	// Move the camera forward based on the current look vector.
@@ -207,5 +225,10 @@ public class Camera implements WorkerReady
 		{
 			System.err.println("The Buffer Passed to " + this.getClass().toGenericString() + " was not a compatible type.");
 		}
+	}
+	
+	public float getAlpha()
+	{
+		return alpha;
 	}
 }

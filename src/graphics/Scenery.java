@@ -91,7 +91,7 @@ public abstract class Scenery
 		tex.disable(gl);
 	}
 	
-	public static void drawWalls(GL2 gl, ArrayList<ArrayList<double[]>> buffer, Texture... tex)
+	public static void drawWalls(GL2 gl, ArrayList<ArrayList<double[]>> buffer, Camera camera, Texture... tex)
 	{
 		int counter = 0;
 		Texture wallTexture = null;
@@ -194,5 +194,53 @@ public abstract class Scenery
 			}
 		}
 		wallTexture.disable(gl);
+			
+		gl.glEnable(GL.GL_BLEND);
+		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+	
+		gl.glBegin(GL2.GL_QUADS);
+		
+		gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		gl.glColor4f(0.0f, 0.0f, 0.0f, camera.getAlpha());
+	
+		
+		double[] where = camera.getLook();
+		double[] pos = camera.getPosition();
+	
+		
+		gl.glVertex3d(pos[0] + 0.003, pos[1] + 0.002, where[2] - 0.15);
+		gl.glVertex3d(pos[0] - 0.003, pos[1] + 0.002, where[2] - 0.15);
+		gl.glVertex3d(pos[0] - 0.003, pos[1] + 0.002, where[2] + 0.15);
+		gl.glVertex3d(pos[0] + 0.003, pos[1] + 0.002, where[2] + 0.15);
+		
+		gl.glVertex3d(pos[0] + 0.003, pos[1] - 0.002, where[2] - 0.15);
+		gl.glVertex3d(pos[0] - 0.003, pos[1] - 0.002, where[2] - 0.15);
+		gl.glVertex3d(pos[0] - 0.003, pos[1] - 0.002, where[2] + 0.15);
+		gl.glVertex3d(pos[0] + 0.003, pos[1] - 0.002, where[2] + 0.15);
+		
+		gl.glVertex3d(pos[0] + 0.003, pos[1] + 0.002, where[2] + 0.15);
+		gl.glVertex3d(pos[0] - 0.003, pos[1] + 0.002, where[2] + 0.15);
+		gl.glVertex3d(pos[0] - 0.003, pos[1] - 0.002, where[2] + 0.15);
+		gl.glVertex3d(pos[0] + 0.003, pos[1] - 0.002, where[2] + 0.15);
+		
+		gl.glVertex3d(pos[0] - 0.003, pos[1] - 0.002, where[2] - 0.15);
+		gl.glVertex3d(pos[0] + 0.003, pos[1] - 0.002, where[2] - 0.15);
+		gl.glVertex3d(pos[0] + 0.003, pos[1] + 0.002, where[2] - 0.15);
+		gl.glVertex3d(pos[0] - 0.003, pos[1] + 0.002, where[2] - 0.15);
+		
+		gl.glVertex3d(pos[0] - 0.003, pos[1] + 0.002, where[2] + 0.15);
+		gl.glVertex3d(pos[0] - 0.003, pos[1] + 0.002, where[2] - 0.15);
+		gl.glVertex3d(pos[0] - 0.003, pos[1] - 0.002, where[2] - 0.15);
+		gl.glVertex3d(pos[0] - 0.003, pos[1] - 0.002, where[2] + 0.15);
+		
+		gl.glVertex3d(pos[0] + 0.003, pos[1] + 0.002, where[2] - 0.15);
+		gl.glVertex3d(pos[0] + 0.003, pos[1] + 0.002, where[2] + 0.15);
+		gl.glVertex3d(pos[0] + 0.003, pos[1] - 0.002, where[2] + 0.15);
+		gl.glVertex3d(pos[0] + 0.003, pos[1] - 0.002, where[2] - 0.15);
+		
+		
+		gl.glEnd();
+	
+		gl.glDisable(GL.GL_BLEND);
 	}
 }

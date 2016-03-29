@@ -34,6 +34,8 @@ public class Director extends ArrayList<String>implements KeyListener
 	private final String PIVOT_RGT = "r:.5";
 	private final String ZOOM_OUT = "z:.02";
 	private final String ZOOM_IN = "z:-.02";
+	private final String ALPHA_UP = "a:-.005";
+	private final String ALPHA_DOWN = "a:.005";
 	
 	@Override
 	public void keyPressed(KeyEvent k) 
@@ -68,11 +70,34 @@ public class Director extends ArrayList<String>implements KeyListener
 			this.remove(ZOOM_IN);
 			this.add(ZOOM_IN);
 		}
+		if(k.getKeyCode() == KeyEvent.VK_2)
+		{
+			this.remove(ALPHA_UP);
+			this.add(ALPHA_UP);
+		}
+		if(k.getKeyCode() == KeyEvent.VK_1)
+		{
+			this.remove(ALPHA_DOWN);
+			this.add(ALPHA_DOWN);
+		}
+		if(k.getKeyCode() == KeyEvent.VK_S)
+		{
+			this.remove(ZOOM_IN);
+			this.add(ZOOM_IN);
+		}
 	}
 
 	@Override
 	public void keyReleased(KeyEvent k) 
 	{
+		if(k.getKeyCode() == KeyEvent.VK_2)
+		{
+			this.remove(ALPHA_UP);
+		}
+		if(k.getKeyCode() == KeyEvent.VK_1)
+		{
+			this.remove(ALPHA_DOWN);
+		}
 		if(k.getKeyCode() == KeyEvent.VK_DOWN)
 		{
 			this.remove(MOVE_BACK);
