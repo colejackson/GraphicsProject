@@ -309,19 +309,24 @@ public class Stage implements GLEventListener
 		}
 		wallTexture.disable(gl);
 		
+		
+		// Turn blending on for the dimming cube 
 		gl.glEnable(GL.GL_BLEND);
 		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 
+		// Start drawing your cube
 		gl.glBegin(gl.GL_QUADS);
 		
 		gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		
+		//
 		gl.glColor4f(0.0f, 0.0f, 0.0f, 0.4f);
 	
-		
+		// Get where the camera is looking as well as its position
 		double[] where = camera.getLook();
 		double[] pos = camera.getPosition();
 
-		
+		// Draw the six faces of the cube
 		gl.glVertex3d(pos[0] + 0.003, pos[1] + 0.002, where[2] - 0.15);
 		gl.glVertex3d(pos[0] - 0.003, pos[1] + 0.002, where[2] - 0.15);
 		gl.glVertex3d(pos[0] - 0.003, pos[1] + 0.002, where[2] + 0.15);
@@ -352,9 +357,9 @@ public class Stage implements GLEventListener
 		gl.glVertex3d(pos[0] + 0.003, pos[1] - 0.002, where[2] + 0.15);
 		gl.glVertex3d(pos[0] + 0.003, pos[1] - 0.002, where[2] - 0.15);
 		
-		
+		// End the quad function
 		gl.glEnd();
-
+		// Turn blending back off
 		gl.glDisable(GL.GL_BLEND);
 	}
 	
