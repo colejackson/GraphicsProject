@@ -2,11 +2,14 @@ package graphics;
 
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
+import java.util.Collection;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.glu.GLU;
 
-public class Camera
+import async.WorkerReady;
+
+public class Camera implements WorkerReady
 {
 	private GL2 gl;
 	private GLU glu;
@@ -33,6 +36,8 @@ public class Camera
 	// Radius and Degree of the view
 	private double radius = 0;
 	private double degree = 30;
+	
+	private float alpha = 0f;
 	
 	//Creates a camera object
 	public Camera(GLU glu, GL2 gl)
@@ -84,6 +89,22 @@ public class Camera
 		{
 			rotate(Double.parseDouble(commands[1]));
 		}
+		else if(commands[0].equals("a"))
+		{
+			adjustAlpha(Double.parseDouble(commands[1]));
+		}
+	}
+	
+	private void adjustAlpha(double degree)
+	{
+		System.out.println(alpha += (float)degree);
+		
+		if((double)alpha + degree > 1)
+			alpha = 1.0f;
+		else if((double)alpha + degree < 0)
+			alpha = 0.0f;
+		else
+			alpha += (float)degree;
 	}
 	
 	// Move the camera forward based on the current look vector.
@@ -97,8 +118,10 @@ public class Camera
 		vecX *= (degree);
 		vecY *= (degree);
 		
-		if(willCollide(posX, posY, posX + (5 * vecX), posY + (5 *vecY)) && posZ < 0.3)
+		if(willCollide(posX, posY, posX + (5 * vecX), posY + (5 * vecY)) && posZ < 0.3)
+		{
 			return;
+		}
 			
 		// Adjust the x values
 		lookX += vecX;
@@ -169,12 +192,6 @@ public class Camera
 		return new double[] {lookX, lookY, lookZ};
 	}
 	
-	public void setBuffer(ArrayList<double[]> arr)
-	{
-		this.buffer = arr;
-		bufferSet = true;
-	}
-	
 	private boolean willCollide(double x1, double y1, double x2, double y2) 
 	{
 		if(!bufferSet)
@@ -195,5 +212,23 @@ public class Camera
 		
 		return false;
 	}
+
+	@Override
+	public void setBuffer(Collection<?> c)
+	{
+		if(c instanceof ArrayList<?>)
+		{
+			this.buffer = (ArrayList<double[]>)c;
+			bufferSet = true;
+		}
+		else
+		{
+			System.err.println("The Buffer Passed to " + this.getClass().toGenericString() + " was not a compatible type.");
+		}
+	}
 	
+	public float getAlpha()
+	{
+		return alpha;
+	}
 }

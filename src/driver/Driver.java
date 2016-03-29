@@ -1,6 +1,6 @@
 package driver;
 
-import frame.MazeFrame;
+import swing.MazeFrame;
 
 // Launching Point for the Maze Program
 public class Driver 
