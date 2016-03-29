@@ -184,7 +184,6 @@ public class Stage implements GLEventListener
 			bufferConsumed = true;
 			newBuffer = false;		
 		}
-		
 		Scenery.drawGround(gl, groundTexture);		
 		Scenery.drawWalls(gl, buffer, camera, wallTexture1, wallTexture1);
 
