@@ -1,10 +1,18 @@
 package graphics;
 
+import java.awt.image.BufferedImage;
+import java.net.URL;
 import java.util.ArrayList;
+
+import javax.imageio.ImageIO;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLProfile;
+import com.jogamp.opengl.glu.GLU;
+import com.jogamp.opengl.util.awt.ImageUtil;
 import com.jogamp.opengl.util.texture.Texture;
+import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
 
 public abstract class Scenery 
 {
@@ -12,6 +20,12 @@ public abstract class Scenery
 	
 	private final static double TREE_HEIGHT = 0.8;
 	private final static double TREE_RADIUS = 0.2;
+	
+	private static Texture groundTexture;
+	private static Texture skyTexture;
+	private static Texture wallTexture;
+	private static Texture wallTexture1;
+	private static Texture wallTexture2;
 	
 	public static void drawTree(double x, double y, GL2 gl)
 	{
@@ -67,12 +81,12 @@ public abstract class Scenery
 		gl.glEnd();
 	}
 	
-	public static void drawGround(GL2 gl, Texture tex)
+	public static void drawGround(GL2 gl)
 	{
 		//Enable the ground texture
 		gl.glColor3f(.6f, .6f, .6f);		//will darken the image being drawn
-		tex.enable(gl);
-		tex.bind(gl);
+		groundTexture.enable(gl);
+		groundTexture.bind(gl);
 		
 		// Draw the ground for the maze to sit on. 10x10.
 		gl.glBegin(GL2.GL_POLYGON);
@@ -88,13 +102,43 @@ public abstract class Scenery
 		gl.glVertex2d(-10, 10);
 
 		gl.glEnd();
-		tex.disable(gl);
+		groundTexture.disable(gl);
 	}
 	
-	public static void drawWalls(GL2 gl, ArrayList<ArrayList<double[]>> buffer, Camera camera, Texture... tex)
+	/*
+	public static void drawSky(GL2 gl, GLU glu)
+	{
+		//Enable the sky texture
+		gl.glColor3f(1.0f, 1.0f, 1.0f);
+		skyTexture.enable(gl);
+		skyTexture.bind(gl);
+		
+		gl.glMatrixMode(GL2.GL_MODELVIEW);
+		gl.glLoadIdentity();
+		gl.glMatrixMode(GL2.GL_PROJECTION);
+		gl.glLoadIdentity();
+		gl.glOrtho(0,1,1,0,-1,1);
+		
+		gl.glBegin(GL2.GL_QUADS);
+		gl.glTexCoord2f(0,0);
+		gl.glVertex2f(0,0);
+		
+		gl.glTexCoord2f(1,0);
+		gl.glVertex2f(1,0);
+		
+		gl.glTexCoord2f(1,1);
+		gl.glVertex2f(1,1);
+		
+		gl.glTexCoord2f(0,1);
+		gl.glVertex2f(0,1);
+		gl.glEnd();
+		skyTexture.disable(gl);
+	}
+	*/
+	
+	public static void drawWalls(GL2 gl, ArrayList<ArrayList<double[]>> buffer, Camera camera)
 	{
 		int counter = 0;
-		Texture wallTexture = null;
 
 		// "All walls are half the walls", so only draw the first three walls.
 		for(int i = 0; i < 3; i++)
@@ -105,13 +149,9 @@ public abstract class Scenery
 				if (counter % 5 == 0)
 				{
 					if (counter % 30 == 0)
-					{
-						wallTexture = tex[1];
-					}
+						wallTexture = wallTexture2;
 					else
-					{
-						wallTexture = tex[0];
-					}
+						wallTexture = wallTexture1;
 				}
 				
 				wallTexture.enable(gl);
@@ -159,6 +199,7 @@ public abstract class Scenery
 				
 				gl.glEnd();
 				
+//				//OUTLINING
 //				//If a side of a wall (AKA not the top)
 //				if(da.length < 7)
 //				{
@@ -194,7 +235,10 @@ public abstract class Scenery
 			}
 		}
 		wallTexture.disable(gl);
-			
+	}
+	
+	public static void drawFilter(GL2 gl, Camera camera)
+	{
 		gl.glEnable(GL.GL_BLEND);
 		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 	
@@ -203,10 +247,8 @@ public abstract class Scenery
 		gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		gl.glColor4f(0.0f, 0.0f, 0.0f, camera.getAlpha());
 	
-		
 		double[] where = camera.getLook();
 		double[] pos = camera.getPosition();
-	
 		
 		gl.glVertex3d(pos[0] + 0.003, pos[1] + 0.002, where[2] - 0.15);
 		gl.glVertex3d(pos[0] - 0.003, pos[1] + 0.002, where[2] - 0.15);
@@ -237,10 +279,45 @@ public abstract class Scenery
 		gl.glVertex3d(pos[0] + 0.003, pos[1] + 0.002, where[2] + 0.15);
 		gl.glVertex3d(pos[0] + 0.003, pos[1] - 0.002, where[2] + 0.15);
 		gl.glVertex3d(pos[0] + 0.003, pos[1] - 0.002, where[2] - 0.15);
-		
 		
 		gl.glEnd();
 	
 		gl.glDisable(GL.GL_BLEND);
+	}
+	
+	public static void initTextures(GL2 gl)
+	{
+		groundTexture = createTexture(gl, "ImagesGround/grassystone.jpg");
+		skyTexture = createTexture(gl, "ImagesSky/skyDay.jpg");
+		
+		//This texture will be set to either wallTexture1 or 2 depending on which should be drawn
+		//Just need to initialize it to some texture here though to avoid null pointer exception
+		wallTexture = createTexture(gl, "ImagesWall/concrete.jpg");
+		
+		wallTexture1 = createTexture(gl, "ImagesWall/concrete.jpg"); //concrete wall texture
+		wallTexture2 = createTexture(gl, "ImagesWall/concrete.jpg"); //metal wall texture
+	}
+	
+	private static Texture createTexture(GL2 gl, String imagePath)
+	{
+		Texture texture = null;
+		try
+		{
+			URL textureURL;
+			textureURL = Scenery.class.getResource(imagePath);
+			
+			if (textureURL != null)
+			{
+				BufferedImage img = ImageIO.read(textureURL);
+				ImageUtil.flipImageVertically(img);
+				texture = AWTTextureIO.newTexture(GLProfile.getDefault(), img, true);
+				texture.setTexParameteri(gl, GL2.GL_TEXTURE_WRAP_S, GL2.GL_REPEAT);
+				texture.setTexParameteri(gl, GL2.GL_TEXTURE_WRAP_T, GL2.GL_REPEAT);
+			}
+		}	
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		return texture;
 	}
 }

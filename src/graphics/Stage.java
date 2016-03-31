@@ -58,13 +58,7 @@ public class Stage implements GLEventListener
 	private Camera camera;
 	private Director director;
 	private ColorPreprocessor cpp;
-	private WallPreprocessor mpp;
-	
-	// Texture objects
-	private Texture groundTexture;
-	private Texture wallTexture;
-	private Texture wallTexture1;
-	private Texture wallTexture2;	
+	private WallPreprocessor mpp;	
 
 	// Make a Stage object containing a Maze
 	public Stage(Maze maze)
@@ -101,7 +95,7 @@ public class Stage implements GLEventListener
 
 	@Override
 	public void init(GLAutoDrawable glad) 
-	{		
+	{
 		// Set the GL Object
 		gl = glad.getGL().getGL2();
 		
@@ -116,11 +110,8 @@ public class Stage implements GLEventListener
 		this.camera = new Camera(glu, gl);
 		
 		// Create the texture objects
-		groundTexture = createTexture("grassystone.jpg");
-		wallTexture1 = createTexture("concrete.jpg");
-		wallTexture2 = createTexture("metal1light.jpg");
-		
-		
+		Scenery.initTextures(gl);
+
 		// Worker
 		ExecutorService es = Executors.newFixedThreadPool(2);
 		
@@ -184,32 +175,11 @@ public class Stage implements GLEventListener
 			bufferConsumed = true;
 			newBuffer = false;		
 		}
-		Scenery.drawGround(gl, groundTexture);		
-		Scenery.drawWalls(gl, buffer, camera, wallTexture1, wallTexture1);
-
-	}
-	
-	private Texture createTexture(String imagePath)
-	{
-		Texture texture = null;
-		try
-		{
-			URL textureURL;
-			textureURL = getClass().getResource(imagePath);
-			
-			if (textureURL != null)
-			{
-				BufferedImage img = ImageIO.read(textureURL);
-				ImageUtil.flipImageVertically(img);
-				texture = AWTTextureIO.newTexture(GLProfile.getDefault(), img, true);
-				texture.setTexParameteri(gl, GL2.GL_TEXTURE_WRAP_S, GL2.GL_REPEAT);
-				texture.setTexParameteri(gl, GL2.GL_TEXTURE_WRAP_T, GL2.GL_REPEAT);
-			}
-		}	
-		catch(Exception e){
-			e.printStackTrace();
-		}
-		return texture;
+		
+		Scenery.drawGround(gl);
+		//Scenery.drawSky(gl, glu);
+		Scenery.drawWalls(gl, buffer, camera);
+		Scenery.drawFilter(gl, camera);
 	}
 	
 	protected void setBuffer() 
