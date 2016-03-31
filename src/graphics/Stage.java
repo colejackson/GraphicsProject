@@ -67,7 +67,7 @@ public class Stage implements GLEventListener
 	private Texture wallTexture2;
 	
 	
-	float start = 0.0f;
+	float start = 0.2f;
 
 	// Make a Stage object containing a Maze
 	public Stage(Maze maze)

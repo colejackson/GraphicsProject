@@ -112,40 +112,42 @@ public abstract class Scenery
 		gl.glColor3f(1.0f, 1.0f, 1.0f);
 		skyTexture.enable(gl);
 		skyTexture.bind(gl);
+		
+		double[] pos = camera.getPosition();
 
 		gl.glBegin(GL2.GL_TRIANGLES);
 		
 		//front side
 		gl.glTexCoord3d(0,4,0);
-		gl.glVertex3d(-5,5,0);
+		gl.glVertex3d(-5+pos[0],5+pos[1],0);
 		gl.glTexCoord3d(0,0,4);
-		gl.glVertex3d(0,0,3);
+		gl.glVertex3d(0+pos[0],0+pos[1],3);
 		gl.glTexCoord3d(4,0,0);
-		gl.glVertex3d(5,5,0);
+		gl.glVertex3d(5+pos[0],5+pos[1],0);
 		
 		//left side
 		gl.glTexCoord3d(0,4,0);
-		gl.glVertex3d(-5,-5,0);
+		gl.glVertex3d(-5+pos[0],-5+pos[1],0);
 		gl.glTexCoord3d(0,0,4);
-		gl.glVertex3d(0,0,3);
+		gl.glVertex3d(0+pos[0],0+pos[1],3);
 		gl.glTexCoord3d(4,0,0);
-		gl.glVertex3d(-5,5,0);
+		gl.glVertex3d(-5+pos[0],5+pos[1],0);
 		
 		//right side
 		gl.glTexCoord3d(0,4,0);
-		gl.glVertex3d(5,-5,0);
+		gl.glVertex3d(5+pos[0],-5+pos[1],0);
 		gl.glTexCoord3d(0,0,4);
-		gl.glVertex3d(0,0,3);
+		gl.glVertex3d(0+pos[0],0+pos[1],3);
 		gl.glTexCoord3d(4,0,0);
-		gl.glVertex3d(5,5,0);
+		gl.glVertex3d(5+pos[0],5+pos[1],0);
 		
 		//back side
 		gl.glTexCoord3d(0,4,0);
-		gl.glVertex3d(-5,-5,0);
+		gl.glVertex3d(-5+pos[0],-5+pos[1],0);
 		gl.glTexCoord3d(0,0,4);
-		gl.glVertex3d(0,0,3);
+		gl.glVertex3d(0+pos[0],0+pos[1],3);
 		gl.glTexCoord3d(4,0,0);
-		gl.glVertex3d(5,-5,0);
+		gl.glVertex3d(5+pos[0],-5+pos[1],0);
 		
 		gl.glEnd();
 		
@@ -298,11 +300,11 @@ public abstract class Scenery
 
 		gl.glTranslatef(0.02f, 0.02f, 0.0f + start);
 		
-		glu.gluSphere(quad, 0.04, 32, 7);
+		glu.gluSphere(quad, 0.04, 32, 32);
 		
 		gl.glPopMatrix();
 		
-		start += 0.001f;
+		start *= 1.001f;
 		 
 		return start;
 		// end ball o light
