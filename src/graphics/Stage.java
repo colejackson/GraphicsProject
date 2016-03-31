@@ -177,7 +177,7 @@ public class Stage implements GLEventListener
 		}
 		
 		Scenery.drawGround(gl);
-		//Scenery.drawSky(gl, glu);
+		Scenery.drawSky(gl, camera);
 		Scenery.drawWalls(gl, buffer, camera);
 		Scenery.drawFilter(gl, camera);
 	}

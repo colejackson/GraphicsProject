@@ -9,7 +9,6 @@ import javax.imageio.ImageIO;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLProfile;
-import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.awt.ImageUtil;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
@@ -105,36 +104,53 @@ public abstract class Scenery
 		groundTexture.disable(gl);
 	}
 	
-	/*
-	public static void drawSky(GL2 gl, GLU glu)
-	{
+	
+	public static void drawSky(GL2 gl, Camera camera)
+	{				
 		//Enable the sky texture
 		gl.glColor3f(1.0f, 1.0f, 1.0f);
 		skyTexture.enable(gl);
 		skyTexture.bind(gl);
+
+		gl.glBegin(GL2.GL_TRIANGLES);
 		
-		gl.glMatrixMode(GL2.GL_MODELVIEW);
-		gl.glLoadIdentity();
-		gl.glMatrixMode(GL2.GL_PROJECTION);
-		gl.glLoadIdentity();
-		gl.glOrtho(0,1,1,0,-1,1);
+		//front side
+		gl.glTexCoord3d(0,4,0);
+		gl.glVertex3d(-5,5,0);
+		gl.glTexCoord3d(0,0,4);
+		gl.glVertex3d(0,0,3);
+		gl.glTexCoord3d(4,0,0);
+		gl.glVertex3d(5,5,0);
 		
-		gl.glBegin(GL2.GL_QUADS);
-		gl.glTexCoord2f(0,0);
-		gl.glVertex2f(0,0);
+		//left side
+		gl.glTexCoord3d(0,4,0);
+		gl.glVertex3d(-5,-5,0);
+		gl.glTexCoord3d(0,0,4);
+		gl.glVertex3d(0,0,3);
+		gl.glTexCoord3d(4,0,0);
+		gl.glVertex3d(-5,5,0);
 		
-		gl.glTexCoord2f(1,0);
-		gl.glVertex2f(1,0);
+		//right side
+		gl.glTexCoord3d(0,4,0);
+		gl.glVertex3d(5,-5,0);
+		gl.glTexCoord3d(0,0,4);
+		gl.glVertex3d(0,0,3);
+		gl.glTexCoord3d(4,0,0);
+		gl.glVertex3d(5,5,0);
 		
-		gl.glTexCoord2f(1,1);
-		gl.glVertex2f(1,1);
+		//back side
+		gl.glTexCoord3d(0,4,0);
+		gl.glVertex3d(-5,-5,0);
+		gl.glTexCoord3d(0,0,4);
+		gl.glVertex3d(0,0,3);
+		gl.glTexCoord3d(4,0,0);
+		gl.glVertex3d(5,-5,0);
 		
-		gl.glTexCoord2f(0,1);
-		gl.glVertex2f(0,1);
 		gl.glEnd();
+		
 		skyTexture.disable(gl);
 	}
-	*/
+	
 	
 	public static void drawWalls(GL2 gl, ArrayList<ArrayList<double[]>> buffer, Camera camera)
 	{
@@ -288,7 +304,7 @@ public abstract class Scenery
 	public static void initTextures(GL2 gl)
 	{
 		groundTexture = createTexture(gl, "ImagesGround/grassystone.jpg");
-		skyTexture = createTexture(gl, "ImagesSky/skyDay.jpg");
+		skyTexture = createTexture(gl, "ImagesSky/skyNight2.jpg");
 		
 		//This texture will be set to either wallTexture1 or 2 depending on which should be drawn
 		//Just need to initialize it to some texture here though to avoid null pointer exception
