@@ -58,7 +58,16 @@ public class Stage implements GLEventListener
 	private Camera camera;
 	private Director director;
 	private ColorPreprocessor cpp;
-	private WallPreprocessor mpp;	
+	private WallPreprocessor mpp;
+	
+	// Texture objects
+	private Texture groundTexture;
+	private Texture wallTexture;
+	private Texture wallTexture1;
+	private Texture wallTexture2;
+	
+	
+	float start = 0.0f;
 
 	// Make a Stage object containing a Maze
 	public Stage(Maze maze)
@@ -162,11 +171,11 @@ public class Stage implements GLEventListener
 		cpp.reset();
 	
 		// Render the maze.
-		render(gl);
+		render(gl, glu);
 	}
 
 	//Method to draw something on the canvas
-	private void render(GL2 gl)
+	private void render(GL2 gl, GLU glu)
 	{	
 		// Switch out the buffer if you need to.
 		if(newBuffer)
@@ -175,11 +184,12 @@ public class Stage implements GLEventListener
 			bufferConsumed = true;
 			newBuffer = false;		
 		}
-		
+
 		Scenery.drawGround(gl);
 		Scenery.drawSky(gl, camera);
 		Scenery.drawWalls(gl, buffer, camera);
-		Scenery.drawFilter(gl, camera);
+		start = Scenery.drawOrbs(gl, glu, start);
+		Scenery.drawDimmer(gl, glu, camera);
 	}
 	
 	protected void setBuffer() 

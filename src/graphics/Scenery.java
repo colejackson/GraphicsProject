@@ -8,6 +8,8 @@ import javax.imageio.ImageIO;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.glu.GLU;
+import com.jogamp.opengl.glu.GLUquadric;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.awt.ImageUtil;
 import com.jogamp.opengl.util.texture.Texture;
@@ -103,7 +105,6 @@ public abstract class Scenery
 		gl.glEnd();
 		groundTexture.disable(gl);
 	}
-	
 	
 	public static void drawSky(GL2 gl, Camera camera)
 	{				
@@ -251,14 +252,12 @@ public abstract class Scenery
 			}
 		}
 		wallTexture.disable(gl);
+		
 	}
 	
-	public static void drawFilter(GL2 gl, Camera camera)
-	{
+	public static void drawDimmer(GL2 gl, GLU glu, Camera camera){
 		gl.glEnable(GL.GL_BLEND);
 		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
-	
-		gl.glBegin(GL2.GL_QUADS);
 		
 		gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		gl.glColor4f(0.0f, 0.0f, 0.0f, camera.getAlpha());
@@ -266,39 +265,47 @@ public abstract class Scenery
 		double[] where = camera.getLook();
 		double[] pos = camera.getPosition();
 		
-		gl.glVertex3d(pos[0] + 0.003, pos[1] + 0.002, where[2] - 0.15);
-		gl.glVertex3d(pos[0] - 0.003, pos[1] + 0.002, where[2] - 0.15);
-		gl.glVertex3d(pos[0] - 0.003, pos[1] + 0.002, where[2] + 0.15);
-		gl.glVertex3d(pos[0] + 0.003, pos[1] + 0.002, where[2] + 0.15);
+		gl.glColor4f(0.0f, 0.0f, 0.0f, camera.getAlpha());
+	
+		gl.glPushMatrix();
+
+		GLUquadric quad = glu.gluNewQuadric();
+		glu.gluQuadricNormals(quad, glu.GLU_SMOOTH);   // Create Smooth Normals ( NEW )
+		glu.gluQuadricTexture(quad, true); 
+
+		gl.glTranslatef((float)pos[0], (float)pos[1], 0.0f);
+
 		
-		gl.glVertex3d(pos[0] + 0.003, pos[1] - 0.002, where[2] - 0.15);
-		gl.glVertex3d(pos[0] - 0.003, pos[1] - 0.002, where[2] - 0.15);
-		gl.glVertex3d(pos[0] - 0.003, pos[1] - 0.002, where[2] + 0.15);
-		gl.glVertex3d(pos[0] + 0.003, pos[1] - 0.002, where[2] + 0.15);
+		glu.gluCylinder(quad, 0.002f, 0.002f, 0.3f, 32, 1);
 		
-		gl.glVertex3d(pos[0] + 0.003, pos[1] + 0.002, where[2] + 0.15);
-		gl.glVertex3d(pos[0] - 0.003, pos[1] + 0.002, where[2] + 0.15);
-		gl.glVertex3d(pos[0] - 0.003, pos[1] - 0.002, where[2] + 0.15);
-		gl.glVertex3d(pos[0] + 0.003, pos[1] - 0.002, where[2] + 0.15);
-		
-		gl.glVertex3d(pos[0] - 0.003, pos[1] - 0.002, where[2] - 0.15);
-		gl.glVertex3d(pos[0] + 0.003, pos[1] - 0.002, where[2] - 0.15);
-		gl.glVertex3d(pos[0] + 0.003, pos[1] + 0.002, where[2] - 0.15);
-		gl.glVertex3d(pos[0] - 0.003, pos[1] + 0.002, where[2] - 0.15);
-		
-		gl.glVertex3d(pos[0] - 0.003, pos[1] + 0.002, where[2] + 0.15);
-		gl.glVertex3d(pos[0] - 0.003, pos[1] + 0.002, where[2] - 0.15);
-		gl.glVertex3d(pos[0] - 0.003, pos[1] - 0.002, where[2] - 0.15);
-		gl.glVertex3d(pos[0] - 0.003, pos[1] - 0.002, where[2] + 0.15);
-		
-		gl.glVertex3d(pos[0] + 0.003, pos[1] + 0.002, where[2] - 0.15);
-		gl.glVertex3d(pos[0] + 0.003, pos[1] + 0.002, where[2] + 0.15);
-		gl.glVertex3d(pos[0] + 0.003, pos[1] - 0.002, where[2] + 0.15);
-		gl.glVertex3d(pos[0] + 0.003, pos[1] - 0.002, where[2] - 0.15);
-		
-		gl.glEnd();
+		gl.glPopMatrix();
+
 	
 		gl.glDisable(GL.GL_BLEND);
+	
+	}
+	
+	public static float drawOrbs(GL2 gl, GLU glu, float start){
+		// Ball o light
+		
+		gl.glColor3f(0.3f, 0.6f, 0.3f);
+		
+		gl.glPushMatrix();
+
+		GLUquadric quad = glu.gluNewQuadric();
+		glu.gluQuadricNormals(quad, glu.GLU_SMOOTH);   // Create Smooth Normals ( NEW )
+		glu.gluQuadricTexture(quad, true); 
+
+		gl.glTranslatef(0.02f, 0.02f, 0.0f + start);
+		
+		glu.gluSphere(quad, 0.04, 32, 7);
+		
+		gl.glPopMatrix();
+		
+		start += 0.001f;
+		 
+		return start;
+		// end ball o light
 	}
 	
 	public static void initTextures(GL2 gl)
