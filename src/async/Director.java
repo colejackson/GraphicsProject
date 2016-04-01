@@ -80,11 +80,6 @@ public class Director extends ArrayList<String>implements KeyListener
 			this.remove(ALPHA_DOWN);
 			this.add(ALPHA_DOWN);
 		}
-		if(k.getKeyCode() == KeyEvent.VK_S)
-		{
-			this.remove(ZOOM_IN);
-			this.add(ZOOM_IN);
-		}
 	}
 
 	@Override
