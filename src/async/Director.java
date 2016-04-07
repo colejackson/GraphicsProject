@@ -4,6 +4,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 
+import graphics.Scenery;
+
 /* 
  * The Director is a special arraylist that will contain directions for the camera async.  
  * The class consistes of event listeners that add commands to the array and remove them 
@@ -79,6 +81,10 @@ public class Director extends ArrayList<String>implements KeyListener
 		{
 			this.remove(ALPHA_DOWN);
 			this.add(ALPHA_DOWN);
+		}
+		if(k.getKeyCode() == KeyEvent.VK_C)
+		{
+			Scenery.addCandle();
 		}
 	}
 

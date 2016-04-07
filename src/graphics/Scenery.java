@@ -27,6 +27,27 @@ public abstract class Scenery
 	private static Texture wallTexture;
 	private static Texture wallTexture1;
 	private static Texture wallTexture2;
+	private static Texture fireTexture;
+	
+	private static Camera myCam;
+	private static double[][] candleCoords = new double[50][2];
+	private static int candleCount = 0;
+	
+	public static void setCamera(Camera cam)
+	{
+		myCam = cam;
+	}
+	
+	public static int getCandleCount()
+	{
+		return candleCount;
+	}
+	
+	public static void addCandle()
+	{
+		candleCoords[candleCount] = new double[] {myCam.getPosition()[0], myCam.getPosition()[1]};
+		++candleCount;
+	}
 	
 	public static void drawTree(double x, double y, GL2 gl)
 	{
@@ -257,6 +278,63 @@ public abstract class Scenery
 		
 	}
 	
+	public static void drawCandle(GL2 gl, GLU glu, int i)
+	{
+		double x = candleCoords[i][0];
+		double y = candleCoords[i][1];
+		
+		//Draw base of candle
+		gl.glColor3d(0.996, 1.0, 0.941);
+		gl.glPushMatrix();
+		GLUquadric quad = glu.gluNewQuadric();
+		gl.glTranslated(x, y, 0.0);
+		glu.gluCylinder(quad, 0.0013f, 0.0013f, 0.025f, 32, 3);
+		gl.glPopMatrix();
+		
+		fireTexture.enable(gl);
+		fireTexture.bind(gl);
+		
+		//Draw flame of candle
+		gl.glColor3d(0.996, 0.663, 0.235);
+		gl.glBegin(GL2.GL_TRIANGLES);
+		
+		//front side
+		gl.glTexCoord3d(0,1,0);
+		gl.glVertex3d(-0.0007+x,0.0007+y,0.025);
+		gl.glTexCoord3d(0,0,1);
+		gl.glVertex3d(0.0+x,y,0.030);
+		gl.glTexCoord3d(1,0,0);
+		gl.glVertex3d(0.0007+x,0.0007+y,0.025);
+		
+		//left side
+		gl.glTexCoord3d(0,1,0);
+		gl.glVertex3d(-0.0007+x,-0.0007+y,0.025);
+		gl.glTexCoord3d(0,0,1);
+		gl.glVertex3d(0.0+x,y,0.030);
+		gl.glTexCoord3d(1,0,0);
+		gl.glVertex3d(-0.0007+x,0.0007+y,0.025);
+		
+		//right side
+		gl.glTexCoord3d(0,1,0);
+		gl.glVertex3d(0.0007+x,-0.0007+y,0.025);
+		gl.glTexCoord3d(0,0,1);
+		gl.glVertex3d(0.0+x,y,0.030);
+		gl.glTexCoord3d(1,0,0);
+		gl.glVertex3d(0.0007+x,0.0007+y,0.025);
+		
+		//back side
+		gl.glTexCoord3d(0,1,0);
+		gl.glVertex3d(-0.0007+x,-0.0007+y,0.025);
+		gl.glTexCoord3d(0,0,1);
+		gl.glVertex3d(0.0+x,y,0.030);
+		gl.glTexCoord3d(1,0,0);
+		gl.glVertex3d(0.0007+x,-0.0007+y,0.025);
+		
+		gl.glEnd();
+		
+		fireTexture.disable(gl);
+	}
+	
 	public static void drawDimmer(GL2 gl, GLU glu, Camera camera){
 		gl.glEnable(GL.GL_BLEND);
 		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
@@ -321,6 +399,8 @@ public abstract class Scenery
 		
 		wallTexture1 = createTexture(gl, "ImagesWall/concrete.jpg"); //concrete wall texture
 		wallTexture2 = createTexture(gl, "ImagesWall/concrete.jpg"); //metal wall texture
+		
+		fireTexture = createTexture(gl, "ImagesOther/fire.jpg"); //fire texture
 	}
 	
 	private static Texture createTexture(GL2 gl, String imagePath)

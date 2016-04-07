@@ -20,6 +20,7 @@ import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.glu.GLU;
+import com.jogamp.opengl.glu.GLUquadric;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.awt.ImageUtil;
 import com.jogamp.opengl.util.gl2.GLUT;
@@ -59,13 +60,6 @@ public class Stage implements GLEventListener
 	private Director director;
 	private ColorPreprocessor cpp;
 	private WallPreprocessor mpp;
-	
-	// Texture objects
-	private Texture groundTexture;
-	private Texture wallTexture;
-	private Texture wallTexture1;
-	private Texture wallTexture2;
-	
 	
 	float start = 0.2f;
 
@@ -188,6 +182,11 @@ public class Stage implements GLEventListener
 		Scenery.drawGround(gl);
 		Scenery.drawSky(gl, camera);
 		Scenery.drawWalls(gl, buffer, camera);
+		
+		Scenery.setCamera(camera);
+		for (int i = 0; i < Scenery.getCandleCount(); ++i)
+			Scenery.drawCandle(gl, glu, i);
+		
 		start = Scenery.drawOrbs(gl, glu, start);
 		Scenery.drawDimmer(gl, glu, camera);
 	}
