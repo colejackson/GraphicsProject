@@ -49,6 +49,35 @@ public abstract class Scenery
 		++candleCount;
 	}
 	
+	public static void removeCandle()
+	{
+		//If the coordinate of a candle falls within a circle around the current position of the camera
+		for (int i = 0; i < candleCount; ++i)
+		{
+			double candleX = candleCoords[i][0];
+			double candleY = candleCoords[i][1];
+			double centerX = myCam.getPosition()[0];
+			double centerY = myCam.getPosition()[1];
+			double radius = 0.1;
+			
+			double lhs = ((candleX-centerX)*(candleX-centerX)) + ((candleY-centerY)*(candleY-centerY));
+			double rhs = radius*radius;
+			
+			//If the candle coordinate lies inside the circle around the camera
+			if (lhs < rhs)
+			{
+				//Pick it up
+				//I.e. remove its coordinate from the array of candle coordinates
+				for (int j = i; j < candleCount-1; ++j)
+				{
+					candleCoords[j] = candleCoords[j+1];
+				}
+				candleCoords[candleCount-1] = null;
+				--candleCount;
+			}	
+		}
+	}
+	
 	public static void drawTree(double x, double y, GL2 gl)
 	{
 		gl.glColor3d(1.0, .55, .55);

@@ -86,6 +86,10 @@ public class Director extends ArrayList<String>implements KeyListener
 		{
 			Scenery.addCandle();
 		}
+		if(k.getKeyCode() == KeyEvent.VK_D)
+		{
+			Scenery.removeCandle();
+		}
 	}
 
 	@Override
