@@ -21,19 +21,19 @@ public class ParticleEngine {
 		}
 	}
 	
-	protected void update(Orb ball, GLU glu, GL2 gl, Camera camera){
+	protected void update(Orb ball, GLU glu, Camera camera){
 		int numNewParticles = 2;
 		
 		for(int i = 0; i < numNewParticles; i++){
 			int dead = firstDead();
-			spawn(particles[dead], ball, glu, gl, camera);
+			spawn(particles[dead], ball, glu, camera);
 		}
 		
 		for(int i = 0; i < numParticles; i++){
 			particles[i].setLife(decay);
 			particles[i].move(count);
 			
-			particles[i].update(glu, gl, camera);
+			particles[i].update(glu, camera);
 		}
 	}
 	
@@ -56,7 +56,7 @@ public class ParticleEngine {
 		return lastUsed;
 	}
 	
-	private void spawn(Particle part, Orb ball, GLU glu, GL2 gl, Camera camera){
+	private void spawn(Particle part, Orb ball, GLU glu, Camera camera){
 		part.newLife();
 		for(int i = 0; i < 3; i++){
 			part.color[i] = ball.color[i];
@@ -88,6 +88,6 @@ public class ParticleEngine {
 			part.position[2] = ball.position[2] - randz * 0.015f;
 
 		
-		part.update(glu, gl, camera);
+		part.update(glu, camera);
 	}
 }

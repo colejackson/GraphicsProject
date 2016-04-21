@@ -17,13 +17,13 @@ import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
 import driver.OGL;
 
 public abstract class Scenery 
-{
-	private static Texture fireTexture;
-	
-	private static Camera myCam;
+{	
+	private static Camera camera;
 	
 	private static GLUquadric quad;
 	private static GLUquadric quad2;
+	
+	private static Texture fireTexture;
 	
 	private final static int NUM_CANDLES = 1000;
 	private static double[][] candleCoords = new double[NUM_CANDLES][2];
@@ -32,7 +32,12 @@ public abstract class Scenery
 
 	public static void initCamera(Camera cam)
 	{
-		myCam = cam;
+		camera = cam;
+	}
+	
+	public static void initTexture()
+	{
+		fireTexture = createTexture("ImagesOther/fire.jpg");
 	}
 	
 	public static void initQuadrics(GLU glu)
@@ -43,11 +48,6 @@ public abstract class Scenery
 		quad2 = glu.gluNewQuadric();
 		//glu.gluQuadricNormals(quad2, glu.GLU_SMOOTH);   // Create Smooth Normals ( NEW )
 		glu.gluQuadricTexture(quad2, true); 
-	}
-	
-	public static void initTextures(GL2 gl)
-	{
-		fireTexture = createTexture("ImagesOther/fire.jpg"); //fire texture
 	}
 	
 	public static int getTotalNumCandles()
@@ -62,7 +62,7 @@ public abstract class Scenery
 	
 	public static void addCandle()
 	{
-		candleCoords[candleCount] = new double[] {myCam.getPosition()[0], myCam.getPosition()[1]};
+		candleCoords[candleCount] = new double[] {camera.getPosition()[0], camera.getPosition()[1]};
 		++candleCount;
 	}
 	
@@ -73,8 +73,8 @@ public abstract class Scenery
 		{
 			double candleX = candleCoords[i][0];
 			double candleY = candleCoords[i][1];
-			double centerX = myCam.getPosition()[0];
-			double centerY = myCam.getPosition()[1];
+			double centerX = camera.getPosition()[0];
+			double centerY = camera.getPosition()[1];
 			double radius = 0.1;
 			
 			double lhs = ((candleX-centerX)*(candleX-centerX)) + ((candleY-centerY)*(candleY-centerY));
@@ -133,7 +133,7 @@ public abstract class Scenery
 		groundTexture.disable(OGL.gl);
 	}
 	
-	public static void drawSky(Camera camera)
+	public static void drawSky()
 	{				
 		Texture skyTexture = createTexture("ImagesSky/skyNight2.jpg");
 		
@@ -252,231 +252,187 @@ public abstract class Scenery
 //	}
 
 	
-	public static void drawCandle(GL2 gl, GLU glu, int i, int option)
+	public static void drawCandle(GLU glu, int i, int option)
 	{
 		double x = candleCoords[i][0];
 		double y = candleCoords[i][1];
 		
 		//Draw base of candle
-		gl.glColor3d(0.965, 0.946, 0.883);
-		gl.glPushMatrix();
-		gl.glTranslated(x, y, 0.0);
+		OGL.gl.glColor3d(0.965, 0.946, 0.883);
+		OGL.gl.glPushMatrix();
+		OGL.gl.glTranslated(x, y, 0.0);
 		glu.gluCylinder(quad, 0.0013f, 0.0013f, 0.025f, 5, 5);
-		gl.glPopMatrix();
+		OGL.gl.glPopMatrix();
 		
 		//Reset color
-		gl.glColor3f(1.0f, 1.0f, 1.0f);
+		OGL.gl.glColor3f(1.0f, 1.0f, 1.0f);
 		
 		//
 		double wind = 0.0;
 		if(option == 0)
 			wind = 0.0;
 		else if(option == 1)
-			wind = -0.0002;
+			wind = -0.0003;
 		else
-			wind = 0.0002;
+			wind = 0.0003;
 		
 		//Enable fire texture
-		fireTexture.enable(gl);
-		fireTexture.bind(gl);
+		fireTexture.enable(OGL.gl);
+		fireTexture.bind(OGL.gl);
 		
 		//Draw flame of candle (pyramid)
-		gl.glColor3d(0.996, 0.663, 0.235);
-		gl.glBegin(GL2.GL_TRIANGLES);
+		OGL.gl.glColor3d(0.996, 0.663, 0.235);
+		OGL.gl.glBegin(GL2.GL_TRIANGLES);
 		
 		//front side
-		gl.glTexCoord3d(0,1,0);
-		gl.glVertex3d(-0.0007+x,0.0007+y,0.026);
-		gl.glTexCoord3d(0,0,1);
-		gl.glVertex3d(wind+x,y,0.031);
-		gl.glTexCoord3d(1,0,0);
-		gl.glVertex3d(0.0007+x,0.0007+y,0.026);
+		OGL.gl.glTexCoord3d(0,1,0);
+		OGL.gl.glVertex3d(-0.0007+x,0.0007+y,0.026);
+		OGL.gl.glTexCoord3d(0,0,1);
+		OGL.gl.glVertex3d(wind+x,y,0.031);
+		OGL.gl.glTexCoord3d(1,0,0);
+		OGL.gl.glVertex3d(0.0007+x,0.0007+y,0.026);
 		
 		//left side
-		gl.glTexCoord3d(0,1,0);
-		gl.glVertex3d(-0.0007+x,-0.0007+y,0.026);
-		gl.glTexCoord3d(0,0,1);
-		gl.glVertex3d(wind+x,y,0.031);
-		gl.glTexCoord3d(1,0,0);
-		gl.glVertex3d(-0.0007+x,0.0007+y,0.026);
+		OGL.gl.glTexCoord3d(0,1,0);
+		OGL.gl.glVertex3d(-0.0007+x,-0.0007+y,0.026);
+		OGL.gl.glTexCoord3d(0,0,1);
+		OGL.gl.glVertex3d(wind+x,y,0.031);
+		OGL.gl.glTexCoord3d(1,0,0);
+		OGL.gl.glVertex3d(-0.0007+x,0.0007+y,0.026);
 		
 		//right side
-		gl.glTexCoord3d(0,1,0);
-		gl.glVertex3d(0.0007+x,-0.0007+y,0.026);
-		gl.glTexCoord3d(0,0,1);
-		gl.glVertex3d(wind+x,y,0.031);
-		gl.glTexCoord3d(1,0,0);
-		gl.glVertex3d(0.0007+x,0.0007+y,0.026);
+		OGL.gl.glTexCoord3d(0,1,0);
+		OGL.gl.glVertex3d(0.0007+x,-0.0007+y,0.026);
+		OGL.gl.glTexCoord3d(0,0,1);
+		OGL.gl.glVertex3d(wind+x,y,0.031);
+		OGL.gl.glTexCoord3d(1,0,0);
+		OGL.gl.glVertex3d(0.0007+x,0.0007+y,0.026);
 		
 		//back side
-		gl.glTexCoord3d(0,1,0);
-		gl.glVertex3d(-0.0007+x,-0.0007+y,0.026);
-		gl.glTexCoord3d(0,0,1);
-		gl.glVertex3d(wind+x,y,0.031);
-		gl.glTexCoord3d(1,0,0);
-		gl.glVertex3d(0.0007+x,-0.0007+y,0.026);
+		OGL.gl.glTexCoord3d(0,1,0);
+		OGL.gl.glVertex3d(-0.0007+x,-0.0007+y,0.026);
+		OGL.gl.glTexCoord3d(0,0,1);
+		OGL.gl.glVertex3d(wind+x,y,0.031);
+		OGL.gl.glTexCoord3d(1,0,0);
+		OGL.gl.glVertex3d(0.0007+x,-0.0007+y,0.026);
 		
-		gl.glEnd();
+		OGL.gl.glEnd();
 
 		//Draw flame of candle (sphere)
-		gl.glPushMatrix();
-		gl.glTranslatef((float)x, (float)y, 0.026f);
-		gl.glScalef(1.0f, 1.0f, 2.0f);
+		OGL.gl.glPushMatrix();
+		OGL.gl.glTranslatef((float)x, (float)y, 0.026f);
+		OGL.gl.glScalef(1.0f, 1.0f, 2.0f);
 		glu.gluSphere(quad2, 0.0009, 5, 5);		
-		gl.glPopMatrix();
+		OGL.gl.glPopMatrix();
 		
 		//Disable the fire texture
-		fireTexture.disable(gl);
-		
-		
-		//Enable transparency
-		gl.glEnable(GL2.GL_BLEND);
-		gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
-		
-		
-//		float[] alphas = new float[] {0.0f, 0.0f, 0.0f};
-//		
-//		if(option == 0)
-//		{
-//			alphas[0] = 0.17f;
-//			alphas[1] = 0.13f;
-//			alphas[2] = 0.09f;
-//		}
-//		else if(option == 1)
-//		{
-//			alphas[0] = 0.09f;
-//			alphas[1] = 0.17f;
-//			alphas[2] = 0.13f;
-//		}
-//		else
-//		{
-//			alphas[0] = 0.13f;
-//			alphas[1] = 0.09f;
-//			alphas[2] = 0.17f;
-//		}
-
-//		Circle		
-//		gl.glColor4f(1.0f, 0.49f, 0.176f, alphas[0]);
-//
-//		double z = 0.029;
-//		gl.glBegin(GL2.GL_TRIANGLE_FAN);						//begin the triangle fan
-//		gl.glVertex3f((float)x, (float)y, (float)z);			//start from the center
-//		for(int s = 0; s < 20; ++s)
-//		{ 
-//			float x1 = (float)x + (0.0040f * (float)Math.cos(s*2.0f*Math.PI / 19));
-//			float z1 = (float)z + (0.0060f * (float)Math.sin(s*2.0f*Math.PI / 19));
-//			gl.glVertex3f(x1, (float)y, z1);
-//		}
-//		gl.glEnd();		
-		
+		fireTexture.disable(OGL.gl);
+				
 		
 		if (option == 0)
 		{
-			gl.glColor4f(1.0f, 0.49f, 0.176f, 0.12f);
-			gl.glPushMatrix();
-			gl.glTranslatef((float)x, (float)y, 0.029f);
-			gl.glScalef(1.0f, 1.0f, 2.0f);
+			OGL.gl.glColor4f(1.0f, 0.49f, 0.176f, 0.12f);
+			OGL.gl.glPushMatrix();
+			OGL.gl.glTranslatef((float)x, (float)y, 0.029f);
+			OGL.gl.glScalef(1.0f, 1.0f, 2.0f);
 			glu.gluSphere(quad, 0.0030, 5, 5);		
-			gl.glPopMatrix();
+			OGL.gl.glPopMatrix();
 			
-			gl.glColor4f(1.0f, 0.49f, 0.176f, 0.08f);
-			gl.glPushMatrix();
-			gl.glTranslatef((float)x, (float)y, 0.029f);
-			gl.glScalef(1.0f, 1.0f, 2.0f);
+			OGL.gl.glColor4f(1.0f, 0.49f, 0.176f, 0.08f);
+			OGL.gl.glPushMatrix();
+			OGL.gl.glTranslatef((float)x, (float)y, 0.029f);
+			OGL.gl.glScalef(1.0f, 1.0f, 2.0f);
 			glu.gluSphere(quad, 0.0060, 5, 5);		
-			gl.glPopMatrix();
+			OGL.gl.glPopMatrix();
 			
-			gl.glColor4f(1.0f, 0.49f, 0.176f, 0.04f);
-			gl.glPushMatrix();
-			gl.glTranslatef((float)x, (float)y, 0.029f);
-			gl.glScalef(1.0f, 1.0f, 2.0f);
+			OGL.gl.glColor4f(1.0f, 0.49f, 0.176f, 0.04f);
+			OGL.gl.glPushMatrix();
+			OGL.gl.glTranslatef((float)x, (float)y, 0.029f);
+			OGL.gl.glScalef(1.0f, 1.0f, 2.0f);
 			glu.gluSphere(quad, 0.0080, 5, 5);
-			gl.glPopMatrix();
+			OGL.gl.glPopMatrix();
 		}
 		else if (option == 1)
 		{	
-			gl.glColor4f(1.0f, 0.49f, 0.176f, 0.12f);
-			gl.glPushMatrix();
-			gl.glTranslatef((float)x, (float)y, 0.029f);
-			gl.glScalef(1.0f, 1.0f, 2.0f);
+			OGL.gl.glColor4f(1.0f, 0.49f, 0.176f, 0.12f);
+			OGL.gl.glPushMatrix();
+			OGL.gl.glTranslatef((float)x, (float)y, 0.029f);
+			OGL.gl.glScalef(1.0f, 1.0f, 2.0f);
 			glu.gluSphere(quad, 0.0060, 5, 5);		
-			gl.glPopMatrix();
+			OGL.gl.glPopMatrix();
 			
-			gl.glColor4f(1.0f, 0.49f, 0.176f, 0.08f);
-			gl.glPushMatrix();
-			gl.glTranslatef((float)x, (float)y, 0.029f);
-			gl.glScalef(1.0f, 1.0f, 2.0f);
+			OGL.gl.glColor4f(1.0f, 0.49f, 0.176f, 0.08f);
+			OGL.gl.glPushMatrix();
+			OGL.gl.glTranslatef((float)x, (float)y, 0.029f);
+			OGL.gl.glScalef(1.0f, 1.0f, 2.0f);
 			glu.gluSphere(quad, 0.0080, 5, 5);
-			gl.glPopMatrix();
+			OGL.gl.glPopMatrix();
 		}
 		else
 		{
-			gl.glColor4f(1.0f, 0.49f, 0.176f, 0.12f);
-			gl.glPushMatrix();
-			gl.glTranslatef((float)x, (float)y, 0.029f);
-			gl.glScalef(1.0f, 1.0f, 2.0f);
+			OGL.gl.glColor4f(1.0f, 0.49f, 0.176f, 0.12f);
+			OGL.gl.glPushMatrix();
+			OGL.gl.glTranslatef((float)x, (float)y, 0.029f);
+			OGL.gl.glScalef(1.0f, 1.0f, 2.0f);
 			glu.gluSphere(quad, 0.0080, 5, 5);
-			gl.glPopMatrix();
+			OGL.gl.glPopMatrix();
 		}
 	}
 	
-	public static void drawDimmer(GL2 gl, GLU glu, Camera camera){
-		gl.glEnable(GL.GL_BLEND);
-		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+	public static void drawDimmer(GLU glu, Camera camera){
+		OGL.gl.glEnable(GL.GL_BLEND);
+		OGL.gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 		
-		gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-		gl.glColor4f(0.0f, 0.0f, 0.0f, camera.getAlpha());
+		OGL.gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		OGL.gl.glColor4f(0.0f, 0.0f, 0.0f, camera.getAlpha());
 	
 		double[] pos = camera.getPosition();
 		
-		gl.glColor4f(0.0f, 0.0f, 0.0f, camera.getAlpha());
+		OGL.gl.glColor4f(0.0f, 0.0f, 0.0f, camera.getAlpha());
 	
-		gl.glPushMatrix();
+		OGL.gl.glPushMatrix();
 
 		GLUquadric quad = glu.gluNewQuadric();
 		glu.gluQuadricNormals(quad, GLU.GLU_SMOOTH);   // Create Smooth Normals ( NEW )
 		glu.gluQuadricTexture(quad, true); 
 
-		gl.glTranslatef((float)pos[0], (float)pos[1], 0.0f);
+		OGL.gl.glTranslatef((float)pos[0], (float)pos[1], 0.0f);
 
 		
 		glu.gluCylinder(quad, 0.002f, 0.002f, 0.3f, 32, 1);
 		
-		gl.glPopMatrix();
+		OGL.gl.glPopMatrix();
 
 	
-		gl.glDisable(GL.GL_BLEND);
+		OGL.gl.glDisable(GL.GL_BLEND);
 	
 	}
 	
-	public static float drawOrbs(GL2 gl, GLU glu, float start){
-		
-		// Ball o light
-		
-		//gl.glColor3f(0.3f, 0.6f, 0.3f);
-		gl.glColor3f(1.0f, 1.0f, 1.0f);
-		fireTexture.enable(gl);
-		fireTexture.bind(gl);
-		gl.glColor3f(1.0f, 1.0f, 1.0f);
-		
-		gl.glPushMatrix();
-
-		GLUquadric quad = glu.gluNewQuadric();
-		glu.gluQuadricNormals(quad, GLU.GLU_SMOOTH);   // Create Smooth Normals ( NEW )
-		glu.gluQuadricTexture(quad, true); 
-
-		gl.glTranslatef(0.02f, 0.02f, 0.0f + start);
-		gl.glScalef(1.0f, 1.0f, 2.0f);
-		
-		glu.gluSphere(quad, 0.04, 32, 32);		
-		
-		gl.glPopMatrix();
-		
-		start *= 1.001f;
-		fireTexture.disable(gl);
-		return start;
-		// end ball o light
-	}
+//	public static float drawOrbs(GLU glu, float start){
+//		
+//		// Ball o light
+//		
+//		//gl.glColor3f(0.3f, 0.6f, 0.3f);
+//		OGL.gl.glColor3f(1.0f, 1.0f, 1.0f);
+//		
+//		OGL.gl.glPushMatrix();
+//
+//		GLUquadric quad = glu.gluNewQuadric();
+//		glu.gluQuadricNormals(quad, GLU.GLU_SMOOTH);   // Create Smooth Normals ( NEW )
+//		glu.gluQuadricTexture(quad, false); 
+//
+//		OGL.gl.glTranslatef(0.02f, 0.02f, 0.0f + start);
+//		OGL.gl.glScalef(1.0f, 1.0f, 2.0f);
+//		
+//		glu.gluSphere(quad, 0.04, 15, 15);		
+//		
+//		OGL.gl.glPopMatrix();
+//		
+//		start *= 1.001f;
+//		
+//		return start;
+//		// end ball o light
+//	}
 	
 
 	public static Texture createTexture(String imagePath)

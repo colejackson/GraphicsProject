@@ -62,8 +62,8 @@ public class Stage implements GLEventListener
 	private Random rand = new Random();
 	private int[] randomNums = new int[Scenery.getTotalNumCandles()];
 
-	private ParticleEngine partEng = new ParticleEngine();
-	private Orb orb = new Orb();
+	private ParticleEngine partEng;
+	private Orb orb;
 
 	// Make a Stage object containing a Maze
 	public Stage(Maze maze)
@@ -148,11 +148,14 @@ public class Stage implements GLEventListener
 		// Enable Antialiasing
 		gl.glEnable(GL.GL_LINE_SMOOTH);
 		
+		orb = new Orb(glu);
+		partEng = new ParticleEngine();
+		
 		// Create a Camera and pass in the gl objects.
 		
 		// Initialize the scenery
+		Scenery.initTexture();
 		Scenery.initQuadrics(glu);
-		Scenery.initTextures(gl);
 		Scenery.initCamera(camera);
 		
 		//Initialize random number array
@@ -161,19 +164,6 @@ public class Stage implements GLEventListener
 
 		gl.glEnable(GL.GL_BLEND);
 		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
-
-//		gl.glEnable(GL2.GL_LIGHTING);
-//		gl.glEnable(GL2.GL_LIGHT0);
-//		gl.glEnable(GL2.GL_LIGHT1);
-//		
-//		float[] lightPos = {(float) camera.getPosition()[0],(float) camera.getPosition()[1],(float) camera.getPosition()[2],1 };        // light position
-//		float[] noAmbient = { 0.1f, 0.1f, .01f, .3f };     // low ambient light
-//		float[] diffuse = { 1.0f, 1.0f, 1.0f, .04f };        // full diffuse colour
-//		
-//		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT, noAmbient, 0);
-//		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, diffuse, 0);
-//		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION,lightPos, 0);
-		
 	}
 
 	@Override
@@ -212,11 +202,11 @@ public class Stage implements GLEventListener
 		}	
 
 		Scenery.drawGround();
-		Scenery.drawSky(camera);
+		Scenery.drawSky();
 		draw.stream().sorted((x,y) -> Integer.compare(x.getTexIndx(), y.getTexIndx())).forEach(c -> c.glDraw());
 		
 		for (int i = 0; i < Scenery.getCandleCount(); ++i)
-			Scenery.drawCandle(gl, glu, i, randomNums[i]);
+			Scenery.drawCandle(glu, i, randomNums[i]);
 		++counter;
 		
 		if(counter == 8)
@@ -226,10 +216,10 @@ public class Stage implements GLEventListener
 				randomNums[i] = rand.nextInt(3);
 		}
 		
-		Scenery.drawDimmer(gl, glu, camera);
+		//Scenery.drawDimmer(glu, camera);
 		
-		orb.drawOrb(gl, glu);
-		partEng.update(orb, glu, gl, camera);
+		orb.drawOrb(glu);
+		partEng.update(orb, glu, camera);
 		
 		tractor.draw();
 		//for(LightBall lb : balls)

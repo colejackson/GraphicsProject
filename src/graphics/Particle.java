@@ -5,6 +5,8 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.glu.GLUquadric;
 
+import driver.OGL;
+
 public class Particle {
 	float[] position = new float[3];
 	float velocityx = 0.001f;
@@ -32,26 +34,21 @@ public class Particle {
 		}
 	}
 	
-	protected void update(GLU glu, GL2 gl, Camera camera){
-		gl.glPushMatrix();
+	protected void update(GLU glu, Camera camera){
+		OGL.gl.glPushMatrix();
 		
-		gl.glEnable(GL.GL_BLEND);
-		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
-		
-		gl.glColor4f(color[0], color[1], color[2], color[3]);
+		OGL.gl.glColor4f(color[0], color[1], color[2], color[3]);
 
 		
 		GLUquadric quad = glu.gluNewQuadric();
 		glu.gluQuadricNormals(quad, glu.GLU_SMOOTH);   // Create Smooth Normals ( NEW )
-		glu.gluQuadricTexture(quad, true); 
+		glu.gluQuadricTexture(quad, false); 
 		
-		gl.glTranslatef(position[0], position[1], position[2]);
-		gl.glScalef(1, 1, 2);
+		OGL.gl.glTranslatef(position[0], position[1], position[2]);
+		OGL.gl.glScalef(1, 1, 2);
 		glu.gluSphere(quad, radius, 10, 10);
-				
-		gl.glDisable(GL.GL_BLEND);
 		
-		gl.glPopMatrix();
+		OGL.gl.glPopMatrix();
 
 	}
 	
