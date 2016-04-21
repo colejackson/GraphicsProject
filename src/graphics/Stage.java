@@ -1,17 +1,9 @@
 package graphics;
 
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
-import java.net.URL;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
-import javax.imageio.ImageIO;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
@@ -21,46 +13,46 @@ import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.glu.GLU;
-import com.jogamp.opengl.glu.GLUquadric;
 import com.jogamp.opengl.util.FPSAnimator;
-import com.jogamp.opengl.util.awt.ImageUtil;
 import com.jogamp.opengl.util.gl2.GLUT;
-import com.jogamp.opengl.util.texture.Texture;
-import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
 
 import async.Director;
-import driver.Utilities;
+import async.Worker;
+import driver.OGL;
 import maze.Maze;
+import maze.Wall;
 import maze.WallPreprocessor;
-import z_deprecated.ColorPreprocessor;
+import objects.LightBall;
+import objects.TractorBeam;
 
 public class Stage implements GLEventListener
 {
+	private Maze maze = null;
+	
 	private boolean newBuffer = false;
-	private boolean bufferConsumed = false;
 	
 	// GL Global Objects
 	private GLProfile profile;
 	private GLCapabilities capabilities;;
 	private GLCanvas canvas;
 	
-	private ArrayList<ArrayList<double[]>> worker = new ArrayList<ArrayList<double[]>>(6);
-	private ArrayList<ArrayList<double[]>> buffer = new ArrayList<ArrayList<double[]>>(6);
-	
-	private ArrayList<double[]> worker_collide = new ArrayList<double[]>();
-	
-	private final boolean running = true;
-	
+	private ArrayList<Wall> buffer = null;
+	private ArrayList<Wall> draw = null;
+			
 	// GL Function Objects
-	GL2 gl;
+	GL2 gl = null;
 	GLU glu = new GLU();
 	GLUT glut = new GLUT();
 	
 	// Maze Related Objects
 	private Camera camera;
 	private Director director;
-	private ColorPreprocessor cpp;
-	private WallPreprocessor mpp;
+	private WallPreprocessor wpp;
+	private Stage stage;
+	
+	// Objects in the Maze
+	private TractorBeam tractor;
+	private ArrayList<LightBall> balls;
 	
 	float start = 0.2f;
 
@@ -71,15 +63,17 @@ public class Stage implements GLEventListener
 
 	// Make a Stage object containing a Maze
 	public Stage(Maze maze)
-	{
-		// Initialize variables except camera which requires the GL2 object be initialized first.
+	{	
+		// Hey its the maze;
+		this.maze = maze;
+		this.stage = this;
+		
+		// Initialize the varibales to set the frame.
+		this.director = new Director();
 		this.profile = GLProfile.getDefault();
 		this.capabilities = new GLCapabilities(profile);
 		this.canvas = new GLCanvas(capabilities);
-		this.mpp = new WallPreprocessor(maze);
-		this.cpp = new ColorPreprocessor(mpp);
-		this.director = new Director();
-						
+		
 		// Configure the canvas, add KeyListener and Request Focus
 		canvas.addGLEventListener(this);
 		canvas.setFocusable(true);
@@ -108,6 +102,41 @@ public class Stage implements GLEventListener
 		// Set the GL Object
 		gl = glad.getGL().getGL2();
 		
+		try 
+		{
+			Field gl_object = OGL.class.getDeclaredField("gl");
+			gl_object.setAccessible(true);
+			
+			Field modifiersField = Field.class.getDeclaredField( "modifiers" );
+            modifiersField.setAccessible( true );
+            modifiersField.setInt(gl_object, gl_object.getModifiers() & ~Modifier.FINAL );
+			
+			gl_object.set(null, gl);
+			
+			gl_object = OGL.class.getDeclaredField("glu");
+			gl_object.setAccessible(true);
+			
+			modifiersField = Field.class.getDeclaredField( "modifiers" );
+            modifiersField.setAccessible( true );
+            modifiersField.setInt(gl_object, gl_object.getModifiers() & ~Modifier.FINAL );
+			
+			gl_object.set(null, glu);
+		} 
+		catch (NoSuchFieldException | SecurityException | IllegalAccessException e) 
+		{
+			e.printStackTrace();
+		}
+		
+		tractor = new TractorBeam(0.0, 0.0);
+		balls = new ArrayList<>();
+		for(int i = 0; i < 5; i++)
+			balls.add(new LightBall(0.0,0.0));
+		
+		// Initialize variables except camera which requires the GL2 object be initialized first.
+		this.wpp = new WallPreprocessor(maze);
+		this.camera = new Camera();
+		new Worker(stage, wpp, camera, balls);
+		
 		// Enable the depth test code.
 		gl.glEnable(GL2.GL_DEPTH_TEST);
 		gl.glDepthFunc(GL2.GL_LESS);
@@ -116,7 +145,6 @@ public class Stage implements GLEventListener
 		gl.glEnable(GL.GL_LINE_SMOOTH);
 		
 		// Create a Camera and pass in the gl objects.
-		this.camera = new Camera(glu, gl);
 		
 		// Initialize the scenery
 		Scenery.initQuadrics(glu);
@@ -127,31 +155,21 @@ public class Stage implements GLEventListener
 		for(int i=0; i<Scenery.getTotalNumCandles(); ++i)
 			randomNums[i] = 0;
 
-		// Worker
-		ExecutorService es = Executors.newFixedThreadPool(2);
+		gl.glEnable(GL.GL_BLEND);
+		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+
+//		gl.glEnable(GL2.GL_LIGHTING);
+//		gl.glEnable(GL2.GL_LIGHT0);
+//		gl.glEnable(GL2.GL_LIGHT1);
+//		
+//		float[] lightPos = {(float) camera.getPosition()[0],(float) camera.getPosition()[1],(float) camera.getPosition()[2],1 };        // light position
+//		float[] noAmbient = { 0.1f, 0.1f, .01f, .3f };     // low ambient light
+//		float[] diffuse = { 1.0f, 1.0f, 1.0f, .04f };        // full diffuse colour
+//		
+//		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT, noAmbient, 0);
+//		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, diffuse, 0);
+//		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION,lightPos, 0);
 		
-		@SuppressWarnings({ "unchecked", "rawtypes", "unused" })
-		final Future f = es.submit(
-			new Callable() 
-			{
-				@Override
-				public Object call() throws Exception 
-				{
-					while(running)
-					{
-						setBuffer();
-						
-						if(!bufferConsumed)
-							Thread.sleep(20);
-						
-						Thread.sleep(50);
-					}
-				}
-			}
-		);
-		
-		buffer = mpp;
-		// End Worker
 	}
 
 	@Override
@@ -172,28 +190,26 @@ public class Stage implements GLEventListener
 		// Check for commands from the director and pass them to the camera.
 		for(String s : director)
 			camera.command(s);
-		
-		// Reset the Color Preprocessor;
-		cpp.reset();
 	
-		// Render the maze.
-		render(gl, glu, glut);
-	}
-
-	//Method to draw something on the canvas
-	private void render(GL2 gl, GLU glu, GLUT glut)
-	{	
+		while(buffer == null)
+		{
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		// Switch out the buffer if you need to.
 		if(newBuffer)
 		{
-			buffer = worker;
-			bufferConsumed = true;
-			newBuffer = false;		
-		}
+			newBuffer = false;	
+			draw = buffer;
+		}	
 
-		Scenery.drawGround(gl);
-		Scenery.drawSky(gl, camera);
-		Scenery.drawWalls(gl, buffer, camera);
+		Scenery.drawGround();
+		Scenery.drawSky(camera);
+		draw.stream().sorted((x,y) -> Integer.compare(x.getTexIndx(), y.getTexIndx())).forEach(c -> c.glDraw());
 		
 		for (int i = 0; i < Scenery.getCandleCount(); ++i)
 			Scenery.drawCandle(gl, glu, i, randomNums[i]);
@@ -206,53 +222,16 @@ public class Stage implements GLEventListener
 				randomNums[i] = rand.nextInt(3);
 		}
 		
-		start = Scenery.drawOrbs(gl, glu, start);
 		Scenery.drawDimmer(gl, glu, camera);
+		
+		tractor.draw();
+		//for(LightBall lb : balls)
+			//lb.draw();
 	}
 	
-	protected void setBuffer() 
-	{		
-		worker = new ArrayList<ArrayList<double[]>>();
-		for(int i = 0; i < 6; i++)
-			worker.add(new ArrayList<double[]>());
-		
-		worker_collide = new ArrayList<double[]>();
-		
-		double posx = camera.getPosition()[0];
-		double posy = camera.getPosition()[1];
-		double lookx = camera.getLook()[0];
-		double looky = camera.getLook()[1];
-		
-		double neglookx = posx - lookx;
-		double neglooky = posy - looky;
-		
-		Line2D line1 = new Line2D.Double(posx, posy, lookx, looky);
-		Line2D line2 = new Line2D.Double(posx, posy, neglookx, neglooky);
-						
-		for(int i = 0; i < 3; i++)
-		{			
-			for(int j = 0; j < mpp.get(i).size(); j++)
-			{				
-				double avgx = (mpp.get(i).get(j)[0] + mpp.get(i).get(j)[2])/2.0;
-				double avgy = (mpp.get(i).get(j)[1] + mpp.get(i).get(j)[3])/2.0;
-
-				double distance = Utilities.distance(avgx, avgy, camera.getPosition()[0], camera.getPosition()[1]);
-				
-				if((.5 >= line1.ptLineDist(avgx, avgy) &&
-				   1.4 >= Point2D.distance(posx, posy, avgx, avgy) &&
-				   line1.ptSegDist(avgx, avgy) <= line2.ptSegDist(avgx, avgy)) ||
-				   .1 > Point2D.distance(posx, posy, avgx, avgy))
-				{
-					worker.get(i).add(mpp.get(i).get(j));
-				}
-				if(distance < .05)
-				{
-					worker_collide.add(mpp.get(i).get(j));
-				}
-			}
-		}
+	public void setBuffer(ArrayList<Wall> al)
+	{
+		this.buffer = al;
 		newBuffer = true;
-		bufferConsumed = false;
-		camera.setBuffer(worker_collide);
 	}
 }

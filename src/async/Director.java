@@ -30,17 +30,17 @@ public class Director extends ArrayList<String>implements KeyListener
 	 */
 	
 	// LIST OF FINAL COMMANDS
-	private final String MOVE_BACK = "f:-.003";
-	private final String MOVE_FORW = "f:.003";
-	private final String PIVOT_LFT = "r:-.5";
-	private final String PIVOT_RGT = "r:.5";
+	private final String MOVE_BACK = "f:-.005";
+	private final String MOVE_FORW = "f:.005";
+	private final String PIVOT_LFT = "r:-.7";
+	private final String PIVOT_RGT = "r:.7";
 	private final String ZOOM_OUT = "z:.02";
 	private final String ZOOM_IN = "z:-.02";
 	private final String ALPHA_UP = "a:-.005";
 	private final String ALPHA_DOWN = "a:.005";
-	
-	private final int max = Scenery.getTotalNumCandles();
-	
+	private final String UP = "u:.02";
+	private final String DOWN = "u:-.02";
+		
 	@Override
 	public void keyPressed(KeyEvent k) 
 	{	
@@ -86,18 +86,22 @@ public class Director extends ArrayList<String>implements KeyListener
 		}
 		if(k.getKeyCode() == KeyEvent.VK_C)
 		{
-			if (Scenery.getCandleCount() < max)
-			{
-				Scenery.addCandle();
-				System.out.println(Scenery.getCandleCount());
-			}
-			else
-				System.out.println("You're out of candles!");
+			Scenery.addCandle();
 		}
 		if(k.getKeyCode() == KeyEvent.VK_D)
 		{
 			if (Scenery.getCandleCount() > 0)
 				Scenery.removeCandle();
+		}
+		if(k.getKeyCode() == KeyEvent.VK_X)
+		{
+			this.remove(UP);
+			this.add(UP);
+		}
+		if(k.getKeyCode() == KeyEvent.VK_Z)
+		{
+			this.remove(DOWN);
+			this.add(DOWN);
 		}
 	}
 
@@ -135,6 +139,14 @@ public class Director extends ArrayList<String>implements KeyListener
 		if(k.getKeyCode() == KeyEvent.VK_S)
 		{
 			this.remove(ZOOM_IN);
+		}
+		if(k.getKeyCode() == KeyEvent.VK_X)
+		{
+			this.remove(UP);
+		}
+		if(k.getKeyCode() == KeyEvent.VK_Z)
+		{
+			this.remove(DOWN);
 		}
 	}
 	

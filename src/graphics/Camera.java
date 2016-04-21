@@ -2,20 +2,21 @@ package graphics;
 
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
-import java.util.Collection;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.glu.GLU;
-import com.jogamp.opengl.glu.GLUquadric;
 
-import async.WorkerReady;
+import driver.GlobalPosition;
+import driver.OGL;
+import maze.Side;
+import maze.Wall;
 
-public class Camera implements WorkerReady
+public class Camera
 {
 	private GL2 gl;
 	private GLU glu;
-	private ArrayList<double[]> buffer;
-	private ArrayList<double[]> collision;
+	private ArrayList<Wall> buffer;
+	private ArrayList<Wall> collision;
 	
 	private boolean bufferSet = false;
 
@@ -41,11 +42,11 @@ public class Camera implements WorkerReady
 	private float alpha = 0f;
 	
 	//Creates a camera object
-	public Camera(GLU glu, GL2 gl)
+	public Camera()
 	{	
 		// Set the GL variables and initiate the view.
-		this.glu = glu;
-		this.gl = gl;
+		this.glu = OGL.glu;
+		this.gl = OGL.gl;
 		
 		init();
 		
@@ -57,7 +58,7 @@ public class Camera implements WorkerReady
 		// Set initial look
 		lookX = 0.0;
 		lookY = -0.02;
-		lookZ = 0.1;
+		lookZ = 0.14;
 		
 		// Set initial up vector
 		upX = 0.0;
@@ -71,7 +72,7 @@ public class Camera implements WorkerReady
 		set();
 
 	}
-
+	
 	//When the director has a request this  processes it
 	public void command(String s)
 	{
@@ -95,12 +96,62 @@ public class Camera implements WorkerReady
 		{
 			adjustAlpha(Double.parseDouble(commands[1]));
 		}
+		else if(commands[0].equals("u"))
+		{
+			up(Double.parseDouble(commands[1]));
+		}
+	}
+	
+	public float getAlpha()
+	{
+		return alpha;
+	}
+
+	public double[] getLook()
+	{
+		return new double[] {lookX, lookY, lookZ};
+	}
+	
+	public double[] getPosition()
+	{
+		return new double[] {posX, posY, posZ};
+	}
+	
+	public void setBuffer(ArrayList<Wall> al)
+	{
+		this.buffer = al;
+		bufferSet = true;
+	}
+	
+	// Set the initial view factors.
+	private void init() 
+	{		
+
+		// Set the view with frustrum
+		gl.glMatrixMode(GL2.GL_PROJECTION);
+		gl.glLoadIdentity();
+		glu.gluPerspective(100.0, .5, 0.001, 10.0);
+		gl.glMatrixMode(GL2.GL_MODELVIEW);
+		gl.glClearColor(.66f, .88f, 1.0f, 0.0f);
+
+	}
+	
+	private void up(double degree)
+	{
+		posZ += degree;
+		lookZ += degree;
+		
+		if(posZ <= 0 || lookZ <= 0)
+		{
+			posZ = .01;
+			lookZ = .01;
+		}
+				
+		set();
 	}
 	
 	private void adjustAlpha(double degree)
-	{
-		System.out.println(alpha += (float)degree);
-		
+	{		
 		if((double)alpha + degree > 1)
 			alpha = 1.0f;
 		else if((double)alpha + degree < 0)
@@ -135,7 +186,20 @@ public class Camera implements WorkerReady
 		
 		set();
 	}
-
+	
+	// Move the z value around and set the camera.
+	private void moveZ(double z)
+	{	
+		posZ += z;
+		
+		if(posZ <= 0)
+		{
+			posZ = .01;
+		}
+				
+		set();
+	}
+	
 	// Rotate (Pivot) the camera
 	private void rotate(double d)
 	{
@@ -151,48 +215,14 @@ public class Camera implements WorkerReady
 		set();
 	}
 	
-	// Move the z value around and set the camera.
-	private void moveZ(double z)
-	{	
-		posZ += z;
-		
-		if(posZ <= 0)
-		{
-			posZ = .01;
-		}
-				
-		set();
-	}
-	
 	// Call this method every time lookat should be called.
 	private void set()
 	{
 		gl.glLoadIdentity();
 		glu.gluLookAt(posX, posY, posZ, lookX, lookY, lookZ, upX, upY, upZ);
-	}
-	
-	// Set the initial view factors.
-	private void init() 
-	{		
-
-		// Set the view with frustrum
-		gl.glMatrixMode(GL2.GL_PROJECTION);
-		gl.glLoadIdentity();
-		glu.gluPerspective(100.0, .5, 0.001, 10.0);
-		gl.glMatrixMode(GL2.GL_MODELVIEW);
-		gl.glClearColor(.66f, .88f, 1.0f, 0.0f);
-
-	}
-	
-	public double[] getPosition()
-	{
-		return new double[] {posX, posY, posZ};
-	}
-	
-	public double[] getLook()
-	{
-		return new double[] {lookX, lookY, lookZ};
-	}
+		
+		GlobalPosition.pos.setLocation(posX, posY);
+	}		
 	
 	private boolean willCollide(double x1, double y1, double x2, double y2) 
 	{
@@ -201,36 +231,20 @@ public class Camera implements WorkerReady
 		
 		collision = buffer;
 		
-		for(double[] da : collision)
+		for(Wall w : collision)
 		{
-			if(da.length < 7)
+			for(Side s : w)
 			{
-				if(Line2D.linesIntersect(x1, y1, x2, y2, da[0], da[1], da[2], da[3]))
-				{					
-					return true;
-				}
+				if(!s.isTop)
+				{
+					if(Line2D.linesIntersect(x1, y1, x2, y2, s.x1, s.y1, s.x2, s.y2))
+					{					
+						return true;
+					}
+				}	
 			}
 		}
 		
 		return false;
-	}
-
-	@Override
-	public void setBuffer(Collection<?> c)
-	{
-		if(c instanceof ArrayList<?>)
-		{
-			this.buffer = (ArrayList<double[]>)c;
-			bufferSet = true;
-		}
-		else
-		{
-			System.err.println("The Buffer Passed to " + this.getClass().toGenericString() + " was not a compatible type.");
-		}
-	}
-	
-	public float getAlpha()
-	{
-		return alpha;
 	}
 }

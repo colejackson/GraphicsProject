@@ -1,23 +1,67 @@
 package maze;
 
-public class Wall 
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import driver.OGL;
+import graphics.Scenery;
+
+public class Wall extends ArrayList<Side> 
 {
-	private static final String METAL_TEXTURE = "ImagesWall/metal1light.jpg";
-	private static final String GRASSSTONE_TEXTURE = "ImagesGround/grassystone.jpg";
-	private static final String CONCRETE_TEXTURE = "ImagesWall/concrete.jpg";
+	private static final long serialVersionUID = -8790194530751762795L;
 	
-	private double x1;
-	private double x2;
-	private double y1;
-	private double y2;
+	private static int lastTexture = -1;
+
 	
-	private boolean isTop;
+	private static Material[] materials = null;
+	private int texIndx;
 	
-	private double x3;
-	private double y3;
-	private double x4;
-	private double y4;
+	static
+	{
+		materials = new Material[2];
+		
+		materials[0] = new Material(Scenery.createTexture("ImagesWall/concrete.jpg"), null);
+		materials[1] = new Material(Scenery.createTexture("ImagesWall/metal1dark.jpg"), null);
+		//materials[2] = new Material(Scenery.createTexture("ImagesWall/hedge.png"), null);
+	}
 	
-	private double z1;
-	private double z2;
+	{
+		this.texIndx = (int)(Math.random()* materials.length);
+	}
+	
+	public Wall(Side... sides)
+	{
+		super();
+		
+		Arrays.stream(sides).forEach(c -> this.add(c));
+	}
+	
+	public void glDraw()
+	{	
+		if(lastTexture == -1)
+		{
+			materials[texIndx].getTexture().enable(OGL.gl);
+			materials[texIndx].getTexture().bind(OGL.gl);
+		}
+		else if(texIndx != lastTexture)
+		{	
+			materials[texIndx-1].getTexture().disable(OGL.gl);
+			materials[texIndx].getTexture().enable(OGL.gl);
+			materials[texIndx].getTexture().bind(OGL.gl);
+			lastTexture = texIndx;
+		}
+				
+		this.stream().forEach(c -> c.glDraw());
+	}
+	
+	public Point2D.Double center()
+	{
+		return this.stream().filter(p -> p.isTop).findFirst().get().center();
+	}
+
+	public int getTexIndx() {
+		return texIndx;
+	}
+	
 }

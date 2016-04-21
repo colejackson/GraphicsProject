@@ -2,6 +2,7 @@ package driver;
 
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.geom.Point2D;
 
 // A Utilities class for the SolarMaze Project, abstract class with static helper methods.
 public abstract class Utilities 
@@ -65,4 +66,10 @@ public abstract class Utilities
 		return Math.sqrt((Math.pow((x1-x2), 2)) + (Math.pow((y1-y2), 2)));
 	}
 	
+	// Helper method to get unit circle angle drawn by two points.
+	public static double getAngle(Point2D.Double p1, Point2D.Double p2)
+	{
+		double twoPi = Math.PI * 2;
+		return (((Math.atan2((p2.getY()-p1.getY()), (p2.getX()-p1.getX())) + twoPi) / (twoPi)) * 360) % 360;
+	}	
 }
