@@ -24,6 +24,8 @@ import maze.Wall;
 import maze.WallPreprocessor;
 import objects.LightBall;
 import objects.TractorBeam;
+import graphics.Orb;
+import graphics.ParticleEngine;
 
 public class Stage implements GLEventListener
 {
@@ -60,6 +62,8 @@ public class Stage implements GLEventListener
 	private Random rand = new Random();
 	private int[] randomNums = new int[Scenery.getTotalNumCandles()];
 
+	private ParticleEngine partEng = new ParticleEngine();
+	private Orb orb = new Orb();
 
 	// Make a Stage object containing a Maze
 	public Stage(Maze maze)
@@ -224,9 +228,14 @@ public class Stage implements GLEventListener
 		
 		Scenery.drawDimmer(gl, glu, camera);
 		
+		orb.drawOrb(gl, glu);
+		partEng.update(orb, glu, gl, camera);
+		
 		tractor.draw();
 		//for(LightBall lb : balls)
 			//lb.draw();
+		
+		
 	}
 	
 	public void setBuffer(ArrayList<Wall> al)
