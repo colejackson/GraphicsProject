@@ -6,6 +6,7 @@ import java.util.Collection;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.glu.GLU;
+import com.jogamp.opengl.glu.GLUquadric;
 
 import async.WorkerReady;
 
@@ -68,6 +69,7 @@ public class Camera implements WorkerReady
 		
 		// Set the camera.
 		set();
+
 	}
 
 	//When the director has a request this  processes it

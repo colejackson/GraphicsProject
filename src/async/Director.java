@@ -39,6 +39,8 @@ public class Director extends ArrayList<String>implements KeyListener
 	private final String ALPHA_UP = "a:-.005";
 	private final String ALPHA_DOWN = "a:.005";
 	
+	private final int max = Scenery.getTotalNumCandles();
+	
 	@Override
 	public void keyPressed(KeyEvent k) 
 	{	
@@ -84,11 +86,18 @@ public class Director extends ArrayList<String>implements KeyListener
 		}
 		if(k.getKeyCode() == KeyEvent.VK_C)
 		{
-			Scenery.addCandle();
+			if (Scenery.getCandleCount() < max)
+			{
+				Scenery.addCandle();
+				System.out.println(Scenery.getCandleCount());
+			}
+			else
+				System.out.println("You're out of candles!");
 		}
 		if(k.getKeyCode() == KeyEvent.VK_D)
 		{
-			Scenery.removeCandle();
+			if (Scenery.getCandleCount() > 0)
+				Scenery.removeCandle();
 		}
 	}
 

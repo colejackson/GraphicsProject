@@ -5,6 +5,7 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -63,6 +64,11 @@ public class Stage implements GLEventListener
 	
 	float start = 0.2f;
 
+	private int counter = 0;
+	private Random rand = new Random();
+	private int[] randomNums = new int[Scenery.getTotalNumCandles()];
+
+
 	// Make a Stage object containing a Maze
 	public Stage(Maze maze)
 	{
@@ -112,8 +118,14 @@ public class Stage implements GLEventListener
 		// Create a Camera and pass in the gl objects.
 		this.camera = new Camera(glu, gl);
 		
-		// Create the texture objects
+		// Initialize the scenery
+		Scenery.initQuadrics(glu);
 		Scenery.initTextures(gl);
+		Scenery.initCamera(camera);
+		
+		//Initialize random number array
+		for(int i=0; i<Scenery.getTotalNumCandles(); ++i)
+			randomNums[i] = 0;
 
 		// Worker
 		ExecutorService es = Executors.newFixedThreadPool(2);
@@ -165,11 +177,11 @@ public class Stage implements GLEventListener
 		cpp.reset();
 	
 		// Render the maze.
-		render(gl, glu);
+		render(gl, glu, glut);
 	}
 
 	//Method to draw something on the canvas
-	private void render(GL2 gl, GLU glu)
+	private void render(GL2 gl, GLU glu, GLUT glut)
 	{	
 		// Switch out the buffer if you need to.
 		if(newBuffer)
@@ -183,9 +195,16 @@ public class Stage implements GLEventListener
 		Scenery.drawSky(gl, camera);
 		Scenery.drawWalls(gl, buffer, camera);
 		
-		Scenery.setCamera(camera);
 		for (int i = 0; i < Scenery.getCandleCount(); ++i)
-			Scenery.drawCandle(gl, glu, i);
+			Scenery.drawCandle(gl, glu, i, randomNums[i]);
+		++counter;
+		
+		if(counter == 8)
+		{
+			counter = 0;
+			for(int i=0; i<Scenery.getTotalNumCandles(); ++i)
+				randomNums[i] = rand.nextInt(3);
+		}
 		
 		start = Scenery.drawOrbs(gl, glu, start);
 		Scenery.drawDimmer(gl, glu, camera);

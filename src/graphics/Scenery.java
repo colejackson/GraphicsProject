@@ -12,6 +12,7 @@ import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.glu.GLUquadric;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.awt.ImageUtil;
+import com.jogamp.opengl.util.gl2.GLUT;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
 
@@ -30,12 +31,43 @@ public abstract class Scenery
 	private static Texture fireTexture;
 	
 	private static Camera myCam;
-	private static double[][] candleCoords = new double[50][2];
+	
+	private static GLUquadric quad;
+	private static GLUquadric quad2;
+	
+	private final static int NUM_CANDLES = 1000;
+	private static double[][] candleCoords = new double[NUM_CANDLES][2];
 	private static int candleCount = 0;
 	
-	public static void setCamera(Camera cam)
+
+	public static void initCamera(Camera cam)
 	{
 		myCam = cam;
+	}
+	
+	public static void initQuadrics(GLU glu)
+	{
+		quad = glu.gluNewQuadric();
+		glu.gluQuadricTexture(quad, false);
+		
+		quad2 = glu.gluNewQuadric();
+		//glu.gluQuadricNormals(quad2, glu.GLU_SMOOTH);   // Create Smooth Normals ( NEW )
+		glu.gluQuadricTexture(quad2, true); 
+	}
+	
+	public static void initTextures(GL2 gl)
+	{
+		groundTexture = createTexture(gl, "ImagesGround/grassystone.jpg");
+		skyTexture = createTexture(gl, "ImagesSky/skyNight2.jpg");
+		wallTexture = createTexture(gl, "ImagesWall/concrete.jpg");
+		wallTexture1 = createTexture(gl, "ImagesWall/concrete.jpg"); //concrete wall texture
+		wallTexture2 = createTexture(gl, "ImagesWall/concrete.jpg"); //metal wall texture
+		fireTexture = createTexture(gl, "ImagesOther/fire.jpg"); //fire texture
+	}
+	
+	public static int getTotalNumCandles()
+	{
+		return NUM_CANDLES;
 	}
 	
 	public static int getCandleCount()
@@ -78,59 +110,59 @@ public abstract class Scenery
 		}
 	}
 	
-	public static void drawTree(double x, double y, GL2 gl)
-	{
-		gl.glColor3d(1.0, .55, .55);
-				
-		drawCylinder(x, y, TREE_HEIGHT, TREE_RADIUS, gl);
-	}
-	
-	public static void drawCylinder(double x, double y, double h, double r, GL2 gl)
-	{
-		double twoPi = Math.PI * 2;
-		
-		for(int i = 0; i < CIRCLE_SIDES; i++)
-		{
-			double x1 = (r * Math.sin((i/CIRCLE_SIDES) * twoPi)) + x;
-			double y1 = (r * Math.cos((i/CIRCLE_SIDES) * twoPi)) + y;
-			
-			double x2 = (r * Math.sin(((i+1)/CIRCLE_SIDES) * twoPi)) + x;
-			double y2 = (r * Math.cos(((i+1)/CIRCLE_SIDES) * twoPi)) + y;
-						
-			gl.glBegin(GL.GL_TRIANGLES);
-			
-			gl.glVertex3d(x, y, 0.0);
-			gl.glVertex3d(x1, y1, 0.0);
-			gl.glVertex3d(x2, y2, 0.0);
-
-			gl.glVertex3d(x, y, h);
-			gl.glVertex3d(x1, y1, h);
-			gl.glVertex3d(x2, y2, h);
-
-			gl.glEnd();
-			
-			gl.glBegin(GL2.GL_POLYGON);
-			
-			gl.glVertex3d(x1, y1, 0.0);
-			gl.glVertex3d(x2, y2, 0.0);
-			gl.glVertex3d(x2, y2, h);
-			gl.glVertex3d(x1, y1, h);
-
-			gl.glEnd();
-		}
-	}
-	
-	public static void drawZRect(double x1, double y1, double x2, double y2, double h, GL2 gl)
-	{
-		gl.glBegin(GL2.GL_POLYGON);
-		
-		gl.glVertex3d(x1, y1, 0.0);
-		gl.glVertex3d(x2, y2, 0.0);
-		gl.glVertex3d(x2, y2, h);
-		gl.glVertex3d(x1, y1, h);
-		
-		gl.glEnd();
-	}
+//	public static void drawTree(double x, double y, GL2 gl)
+//	{
+//		gl.glColor3d(1.0, .55, .55);
+//				
+//		drawCylinder(x, y, TREE_HEIGHT, TREE_RADIUS, gl);
+//	}
+//	
+//	public static void drawCylinder(double x, double y, double h, double r, GL2 gl)
+//	{
+//		double twoPi = Math.PI * 2;
+//		
+//		for(int i = 0; i < CIRCLE_SIDES; i++)
+//		{
+//			double x1 = (r * Math.sin((i/CIRCLE_SIDES) * twoPi)) + x;
+//			double y1 = (r * Math.cos((i/CIRCLE_SIDES) * twoPi)) + y;
+//			
+//			double x2 = (r * Math.sin(((i+1)/CIRCLE_SIDES) * twoPi)) + x;
+//			double y2 = (r * Math.cos(((i+1)/CIRCLE_SIDES) * twoPi)) + y;
+//						
+//			gl.glBegin(GL.GL_TRIANGLES);
+//			
+//			gl.glVertex3d(x, y, 0.0);
+//			gl.glVertex3d(x1, y1, 0.0);
+//			gl.glVertex3d(x2, y2, 0.0);
+//
+//			gl.glVertex3d(x, y, h);
+//			gl.glVertex3d(x1, y1, h);
+//			gl.glVertex3d(x2, y2, h);
+//
+//			gl.glEnd();
+//			
+//			gl.glBegin(GL2.GL_POLYGON);
+//			
+//			gl.glVertex3d(x1, y1, 0.0);
+//			gl.glVertex3d(x2, y2, 0.0);
+//			gl.glVertex3d(x2, y2, h);
+//			gl.glVertex3d(x1, y1, h);
+//
+//			gl.glEnd();
+//		}
+//	}
+//	
+//	public static void drawZRect(double x1, double y1, double x2, double y2, double h, GL2 gl)
+//	{
+//		gl.glBegin(GL2.GL_POLYGON);
+//		
+//		gl.glVertex3d(x1, y1, 0.0);
+//		gl.glVertex3d(x2, y2, 0.0);
+//		gl.glVertex3d(x2, y2, h);
+//		gl.glVertex3d(x1, y1, h);
+//		
+//		gl.glEnd();
+//	}
 	
 	public static void drawGround(GL2 gl)
 	{
@@ -267,101 +299,180 @@ public abstract class Scenery
 				}
 				
 				gl.glEnd();
-				
-//				//OUTLINING
-//				//If a side of a wall (AKA not the top)
-//				if(da.length < 7)
-//				{
-//					//Outline the walls for more texture
-//					if (wallTexture == wallTexture2)
-//						gl.glColor3f(.4f, .4f, .4f);
-//					else
-//						gl.glColor3f(.6f, .6f, .6f);
-//					
-//					gl.glLineWidth(2.0f);
-//					gl.glBegin(GL.GL_LINES);
-//					
-//					//bottom
-//					gl.glVertex3d(da[0], da[1], da[4]);
-//					gl.glVertex3d(da[2], da[3], da[4]);
-//					
-//					//top
-//					gl.glVertex3d(da[0], da[1], da[5]);
-//					gl.glVertex3d(da[2], da[3], da[5]);
-//					
-//					//Side
-//					//gl.glVertex3d(da[0], da[1], da[4]);
-//					//gl.glVertex3d(da[0], da[1], da[5]);
-//					
-//					//Side
-//					//gl.glVertex3d(da[2], da[3], da[4]);
-//					//gl.glVertex3d(da[2], da[3], da[5]);
-//					
-//					gl.glEnd();	
-//				}
 					
 				++counter;
 			}
 		}
 		wallTexture.disable(gl);
-		
 	}
+
 	
-	public static void drawCandle(GL2 gl, GLU glu, int i)
+	public static void drawCandle(GL2 gl, GLU glu, int i, int option)
 	{
 		double x = candleCoords[i][0];
 		double y = candleCoords[i][1];
 		
 		//Draw base of candle
-		gl.glColor3d(0.996, 1.0, 0.941);
+		gl.glColor3d(0.965, 0.946, 0.883);
 		gl.glPushMatrix();
-		GLUquadric quad = glu.gluNewQuadric();
 		gl.glTranslated(x, y, 0.0);
-		glu.gluCylinder(quad, 0.0013f, 0.0013f, 0.025f, 32, 3);
+		glu.gluCylinder(quad, 0.0013f, 0.0013f, 0.025f, 5, 5);
 		gl.glPopMatrix();
 		
+		//Reset color
+		gl.glColor3f(1.0f, 1.0f, 1.0f);
+		
+		//
+		double wind = 0.0;
+		if(option == 0)
+			wind = 0.0;
+		else if(option == 1)
+			wind = -0.0002;
+		else
+			wind = 0.0002;
+		
+		//Enable fire texture
 		fireTexture.enable(gl);
 		fireTexture.bind(gl);
 		
-		//Draw flame of candle
+		//Draw flame of candle (pyramid)
 		gl.glColor3d(0.996, 0.663, 0.235);
 		gl.glBegin(GL2.GL_TRIANGLES);
 		
 		//front side
 		gl.glTexCoord3d(0,1,0);
-		gl.glVertex3d(-0.0007+x,0.0007+y,0.025);
+		gl.glVertex3d(-0.0007+x,0.0007+y,0.026);
 		gl.glTexCoord3d(0,0,1);
-		gl.glVertex3d(0.0+x,y,0.030);
+		gl.glVertex3d(wind+x,y,0.031);
 		gl.glTexCoord3d(1,0,0);
-		gl.glVertex3d(0.0007+x,0.0007+y,0.025);
+		gl.glVertex3d(0.0007+x,0.0007+y,0.026);
 		
 		//left side
 		gl.glTexCoord3d(0,1,0);
-		gl.glVertex3d(-0.0007+x,-0.0007+y,0.025);
+		gl.glVertex3d(-0.0007+x,-0.0007+y,0.026);
 		gl.glTexCoord3d(0,0,1);
-		gl.glVertex3d(0.0+x,y,0.030);
+		gl.glVertex3d(wind+x,y,0.031);
 		gl.glTexCoord3d(1,0,0);
-		gl.glVertex3d(-0.0007+x,0.0007+y,0.025);
+		gl.glVertex3d(-0.0007+x,0.0007+y,0.026);
 		
 		//right side
 		gl.glTexCoord3d(0,1,0);
-		gl.glVertex3d(0.0007+x,-0.0007+y,0.025);
+		gl.glVertex3d(0.0007+x,-0.0007+y,0.026);
 		gl.glTexCoord3d(0,0,1);
-		gl.glVertex3d(0.0+x,y,0.030);
+		gl.glVertex3d(wind+x,y,0.031);
 		gl.glTexCoord3d(1,0,0);
-		gl.glVertex3d(0.0007+x,0.0007+y,0.025);
+		gl.glVertex3d(0.0007+x,0.0007+y,0.026);
 		
 		//back side
 		gl.glTexCoord3d(0,1,0);
-		gl.glVertex3d(-0.0007+x,-0.0007+y,0.025);
+		gl.glVertex3d(-0.0007+x,-0.0007+y,0.026);
 		gl.glTexCoord3d(0,0,1);
-		gl.glVertex3d(0.0+x,y,0.030);
+		gl.glVertex3d(wind+x,y,0.031);
 		gl.glTexCoord3d(1,0,0);
-		gl.glVertex3d(0.0007+x,-0.0007+y,0.025);
+		gl.glVertex3d(0.0007+x,-0.0007+y,0.026);
 		
 		gl.glEnd();
+
+		//Draw flame of candle (sphere)
+		gl.glPushMatrix();
+		gl.glTranslatef((float)x, (float)y, 0.026f);
+		gl.glScalef(1.0f, 1.0f, 2.0f);
+		glu.gluSphere(quad2, 0.0009, 5, 5);		
+		gl.glPopMatrix();
 		
+		//Disable the fire texture
 		fireTexture.disable(gl);
+		
+		
+		//Enable transparency
+		gl.glEnable(GL2.GL_BLEND);
+		gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
+		
+		
+//		float[] alphas = new float[] {0.0f, 0.0f, 0.0f};
+//		
+//		if(option == 0)
+//		{
+//			alphas[0] = 0.17f;
+//			alphas[1] = 0.13f;
+//			alphas[2] = 0.09f;
+//		}
+//		else if(option == 1)
+//		{
+//			alphas[0] = 0.09f;
+//			alphas[1] = 0.17f;
+//			alphas[2] = 0.13f;
+//		}
+//		else
+//		{
+//			alphas[0] = 0.13f;
+//			alphas[1] = 0.09f;
+//			alphas[2] = 0.17f;
+//		}
+
+//		Circle		
+//		gl.glColor4f(1.0f, 0.49f, 0.176f, alphas[0]);
+//
+//		double z = 0.029;
+//		gl.glBegin(GL2.GL_TRIANGLE_FAN);						//begin the triangle fan
+//		gl.glVertex3f((float)x, (float)y, (float)z);			//start from the center
+//		for(int s = 0; s < 20; ++s)
+//		{ 
+//			float x1 = (float)x + (0.0040f * (float)Math.cos(s*2.0f*Math.PI / 19));
+//			float z1 = (float)z + (0.0060f * (float)Math.sin(s*2.0f*Math.PI / 19));
+//			gl.glVertex3f(x1, (float)y, z1);
+//		}
+//		gl.glEnd();		
+		
+		
+		if (option == 0)
+		{
+			gl.glColor4f(1.0f, 0.49f, 0.176f, 0.12f);
+			gl.glPushMatrix();
+			gl.glTranslatef((float)x, (float)y, 0.029f);
+			gl.glScalef(1.0f, 1.0f, 2.0f);
+			glu.gluSphere(quad, 0.0030, 5, 5);		
+			gl.glPopMatrix();
+			
+			gl.glColor4f(1.0f, 0.49f, 0.176f, 0.08f);
+			gl.glPushMatrix();
+			gl.glTranslatef((float)x, (float)y, 0.029f);
+			gl.glScalef(1.0f, 1.0f, 2.0f);
+			glu.gluSphere(quad, 0.0060, 5, 5);		
+			gl.glPopMatrix();
+			
+			gl.glColor4f(1.0f, 0.49f, 0.176f, 0.04f);
+			gl.glPushMatrix();
+			gl.glTranslatef((float)x, (float)y, 0.029f);
+			gl.glScalef(1.0f, 1.0f, 2.0f);
+			glu.gluSphere(quad, 0.0080, 5, 5);
+			gl.glPopMatrix();
+		}
+		else if (option == 1)
+		{	
+			gl.glColor4f(1.0f, 0.49f, 0.176f, 0.12f);
+			gl.glPushMatrix();
+			gl.glTranslatef((float)x, (float)y, 0.029f);
+			gl.glScalef(1.0f, 1.0f, 2.0f);
+			glu.gluSphere(quad, 0.0060, 5, 5);		
+			gl.glPopMatrix();
+			
+			gl.glColor4f(1.0f, 0.49f, 0.176f, 0.08f);
+			gl.glPushMatrix();
+			gl.glTranslatef((float)x, (float)y, 0.029f);
+			gl.glScalef(1.0f, 1.0f, 2.0f);
+			glu.gluSphere(quad, 0.0080, 5, 5);
+			gl.glPopMatrix();
+		}
+		else
+		{
+			gl.glColor4f(1.0f, 0.49f, 0.176f, 0.12f);
+			gl.glPushMatrix();
+			gl.glTranslatef((float)x, (float)y, 0.029f);
+			gl.glScalef(1.0f, 1.0f, 2.0f);
+			glu.gluSphere(quad, 0.0080, 5, 5);
+			gl.glPopMatrix();
+		}
 	}
 	
 	public static void drawDimmer(GL2 gl, GLU glu, Camera camera){
@@ -395,9 +506,14 @@ public abstract class Scenery
 	}
 	
 	public static float drawOrbs(GL2 gl, GLU glu, float start){
+		
 		// Ball o light
 		
-		gl.glColor3f(0.3f, 0.6f, 0.3f);
+		//gl.glColor3f(0.3f, 0.6f, 0.3f);
+		gl.glColor3f(1.0f, 1.0f, 1.0f);
+		fireTexture.enable(gl);
+		fireTexture.bind(gl);
+		gl.glColor3f(1.0f, 1.0f, 1.0f);
 		
 		gl.glPushMatrix();
 
@@ -406,31 +522,19 @@ public abstract class Scenery
 		glu.gluQuadricTexture(quad, true); 
 
 		gl.glTranslatef(0.02f, 0.02f, 0.0f + start);
+		gl.glScalef(1.0f, 1.0f, 2.0f);
 		
-		glu.gluSphere(quad, 0.04, 32, 32);
+		glu.gluSphere(quad, 0.04, 32, 32);		
 		
 		gl.glPopMatrix();
 		
 		start *= 1.001f;
-		 
+		fireTexture.disable(gl);
 		return start;
 		// end ball o light
 	}
 	
-	public static void initTextures(GL2 gl)
-	{
-		groundTexture = createTexture(gl, "ImagesGround/grassystone.jpg");
-		skyTexture = createTexture(gl, "ImagesSky/skyNight2.jpg");
-		
-		//This texture will be set to either wallTexture1 or 2 depending on which should be drawn
-		//Just need to initialize it to some texture here though to avoid null pointer exception
-		wallTexture = createTexture(gl, "ImagesWall/concrete.jpg");
-		
-		wallTexture1 = createTexture(gl, "ImagesWall/concrete.jpg"); //concrete wall texture
-		wallTexture2 = createTexture(gl, "ImagesWall/concrete.jpg"); //metal wall texture
-		
-		fireTexture = createTexture(gl, "ImagesOther/fire.jpg"); //fire texture
-	}
+
 	
 	private static Texture createTexture(GL2 gl, String imagePath)
 	{
