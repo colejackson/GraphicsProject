@@ -3,7 +3,6 @@ package graphics;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Random;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
@@ -55,15 +54,10 @@ public class Stage implements GLEventListener
 	// Objects in the Maze
 	private TractorBeam tractor;
 	private ArrayList<LightBall> balls;
-	
-	float start = 0.2f;
-
-	private int counter = 0;
-	private Random rand = new Random();
-	private int[] randomNums = new int[Scenery.getTotalNumCandles()];
-
 	private ParticleEngine partEng;
 	private Orb orb;
+	
+	float start = 0.2f;
 
 	// Make a Stage object containing a Maze
 	public Stage(Maze maze)
@@ -148,22 +142,16 @@ public class Stage implements GLEventListener
 		// Enable Antialiasing
 		gl.glEnable(GL.GL_LINE_SMOOTH);
 		
-		orb = new Orb(glu);
-		partEng = new ParticleEngine();
-		
-		// Create a Camera and pass in the gl objects.
-		
-		// Initialize the scenery
-		Scenery.initTexture();
-		Scenery.initQuadrics(glu);
-		Scenery.initCamera(camera);
-		
-		//Initialize random number array
-		for(int i=0; i<Scenery.getTotalNumCandles(); ++i)
-			randomNums[i] = 0;
-
+		//Enable transparency
 		gl.glEnable(GL.GL_BLEND);
 		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+		
+		orb = new Orb();
+		partEng = new ParticleEngine();
+		
+		// Initialize the scenery
+		Scenery.initTextures();
+		Scenery.initCamera(camera);
 	}
 
 	@Override
@@ -205,16 +193,7 @@ public class Stage implements GLEventListener
 		Scenery.drawSky();
 		draw.stream().sorted((x,y) -> Integer.compare(x.getTexIndx(), y.getTexIndx())).forEach(c -> c.glDraw());
 		
-		for (int i = 0; i < Scenery.getCandleCount(); ++i)
-			Scenery.drawCandle(glu, i, randomNums[i]);
-		++counter;
-		
-		if(counter == 8)
-		{
-			counter = 0;
-			for(int i=0; i<Scenery.getTotalNumCandles(); ++i)
-				randomNums[i] = rand.nextInt(3);
-		}
+		Scenery.drawCandles(glu);
 		
 		//Scenery.drawDimmer(glu, camera);
 		
@@ -224,8 +203,6 @@ public class Stage implements GLEventListener
 		tractor.draw();
 		//for(LightBall lb : balls)
 			//lb.draw();
-		
-		
 	}
 	
 	public void setBuffer(ArrayList<Wall> al)

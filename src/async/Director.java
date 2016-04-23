@@ -90,8 +90,7 @@ public class Director extends ArrayList<String>implements KeyListener
 		}
 		if(k.getKeyCode() == KeyEvent.VK_D)
 		{
-			if (Scenery.getCandleCount() > 0)
-				Scenery.removeCandle();
+			Scenery.removeCandle();
 		}
 		if(k.getKeyCode() == KeyEvent.VK_X)
 		{

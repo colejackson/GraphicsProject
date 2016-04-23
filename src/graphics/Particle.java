@@ -1,7 +1,6 @@
 package graphics;
 
 import com.jogamp.opengl.GL;
-import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.glu.GLUquadric;
 
@@ -35,20 +34,19 @@ public class Particle {
 	}
 	
 	protected void update(GLU glu, Camera camera){
-		OGL.gl.glPushMatrix();
-		
-		OGL.gl.glColor4f(color[0], color[1], color[2], color[3]);
-
-		
 		GLUquadric quad = glu.gluNewQuadric();
 		glu.gluQuadricNormals(quad, glu.GLU_SMOOTH);   // Create Smooth Normals ( NEW )
 		glu.gluQuadricTexture(quad, false); 
+		
+		OGL.gl.glColor4f(color[0], color[1], color[2], color[3]);
+		OGL.gl.glPushMatrix();
 		
 		OGL.gl.glTranslatef(position[0], position[1], position[2]);
 		OGL.gl.glScalef(1, 1, 2);
 		glu.gluSphere(quad, radius, 10, 10);
 		
 		OGL.gl.glPopMatrix();
+		//glu.gluDeleteQuadric(quad);
 
 	}
 	
@@ -81,5 +79,3 @@ public class Particle {
 		position[2] += Math.random() * 0.001;
 	}
 }
-
-

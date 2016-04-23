@@ -2,6 +2,7 @@ package graphics;
 
 import java.awt.image.BufferedImage;
 import java.net.URL;
+import java.util.Random;
 
 import javax.imageio.ImageIO;
 
@@ -20,14 +21,21 @@ public abstract class Scenery
 {	
 	private static Camera camera;
 	
-	private static GLUquadric quad;
-	private static GLUquadric quad2;
-	
+	//Textures, so they don't have to be created every time drawn
+	private static Texture groundTexture;
+	private static Texture skyTexture;
 	private static Texture fireTexture;
 	
-	private final static int NUM_CANDLES = 1000;
-	private static double[][] candleCoords = new double[NUM_CANDLES][2];
+	//Candle info
+	private final static int MAX_NUM_CANDLES = 500;
+	private static Candle[] candles = new Candle[MAX_NUM_CANDLES];
 	private static int candleCount = 0;
+	
+	//Used by candle methods
+	private static Random rand = new Random();
+	private static int drawCounter = 0;
+	private static double[] wind = new double[MAX_NUM_CANDLES];
+	private static int[] flicker = new int[MAX_NUM_CANDLES];
 	
 
 	public static void initCamera(Camera cam)
@@ -35,24 +43,11 @@ public abstract class Scenery
 		camera = cam;
 	}
 	
-	public static void initTexture()
+	public static void initTextures()
 	{
+		groundTexture = createTexture("ImagesGround/grassystone.jpg");
+		skyTexture = createTexture("ImagesSky/skyNight2.jpg");
 		fireTexture = createTexture("ImagesOther/fire.jpg");
-	}
-	
-	public static void initQuadrics(GLU glu)
-	{
-		quad = glu.gluNewQuadric();
-		glu.gluQuadricTexture(quad, false);
-		
-		quad2 = glu.gluNewQuadric();
-		//glu.gluQuadricNormals(quad2, glu.GLU_SMOOTH);   // Create Smooth Normals ( NEW )
-		glu.gluQuadricTexture(quad2, true); 
-	}
-	
-	public static int getTotalNumCandles()
-	{
-		return NUM_CANDLES;
 	}
 	
 	public static int getCandleCount()
@@ -60,19 +55,32 @@ public abstract class Scenery
 		return candleCount;
 	}
 	
+	public static Candle getCandles(int index)
+	{
+		return candles[index];
+	}
+	
 	public static void addCandle()
 	{
-		candleCoords[candleCount] = new double[] {camera.getPosition()[0], camera.getPosition()[1]};
+		if(candleCount == MAX_NUM_CANDLES)
+			return;
+		
+		//Candle candle = new Candle((.90*camera.getPosition()[0] + .10*camera.getLook()[0]), (.90*camera.getPosition()[1] + .10*camera.getLook()[1]));
+		Candle candle = new Candle(camera.getPosition()[0], camera.getPosition()[1]);
+		candles[candleCount] = candle;
 		++candleCount;
 	}
 	
 	public static void removeCandle()
 	{
+		if(candleCount == 0)
+			return;
+		
 		//If the coordinate of a candle falls within a circle around the current position of the camera
 		for (int i = 0; i < candleCount; ++i)
 		{
-			double candleX = candleCoords[i][0];
-			double candleY = candleCoords[i][1];
+			double candleX = candles[i].getX();
+			double candleY = candles[i].getY();
 			double centerX = camera.getPosition()[0];
 			double centerY = camera.getPosition()[1];
 			double radius = 0.1;
@@ -84,12 +92,9 @@ public abstract class Scenery
 			if (lhs < rhs)
 			{
 				//Pick it up
-				//I.e. remove its coordinate from the array of candle coordinates
 				for (int j = i; j < candleCount-1; ++j)
-				{
-					candleCoords[j] = candleCoords[j+1];
-				}
-				candleCoords[candleCount-1] = null;
+					candles[j] = candles[j+1];
+				candles[candleCount-1] = null;
 				--candleCount;
 			}	
 		}
@@ -109,8 +114,6 @@ public abstract class Scenery
 	
 	public static void drawGround()
 	{
-		Texture groundTexture = createTexture("ImagesGround/grassystone.jpg");
-		
 		//Enable the ground texture
 		OGL.gl.glColor3f(.6f, .6f, .6f);		//will darken the image being drawn
 		groundTexture.enable(OGL.gl);
@@ -134,9 +137,7 @@ public abstract class Scenery
 	}
 	
 	public static void drawSky()
-	{				
-		Texture skyTexture = createTexture("ImagesSky/skyNight2.jpg");
-		
+	{			
 		//Enable the sky texture
 		OGL.gl.glColor3f(1.0f, 1.0f, 1.0f);
 		skyTexture.enable(OGL.gl);
@@ -252,131 +253,49 @@ public abstract class Scenery
 //	}
 
 	
-	public static void drawCandle(GLU glu, int i, int option)
+	public static void drawCandles(GLU glu)
+	{	
+		if(drawCounter == 12)
+		{
+			for(int i=0; i<candleCount; ++i)
+			{
+				wind[i] = -0.0005 + (0.0005 - (-0.0005)) * rand.nextDouble();
+				flicker[i] = rand.nextInt(3);
+			}
+			drawCounter = 0;
+		}
+		
+		for(int i = 0; i < candleCount; ++i)
+		{
+			//if(inFront(candles[i]))
+			//{
+			candles[i].drawBase(glu);
+			candles[i].drawFlame(glu, fireTexture, wind[i]);
+			candles[i].drawFlicker(glu, flicker[i]);
+			//}
+		}
+		
+		++drawCounter;	
+	}
+	
+	//Not working right yet, 
+	//but trying to only draw candles in front of camera and not behind to improve performance even more
+	public static boolean inFront(Candle c)
 	{
-		double x = candleCoords[i][0];
-		double y = candleCoords[i][1];
+		//Find slope of line between camera position and look
+		double slope = (camera.getLook()[1] - camera.getPosition()[1])/(camera.getLook()[0] - camera.getPosition()[0]);
+		double m = -1.0/slope;
+		double b = camera.getPosition()[1] - (camera.getPosition()[0]*m);
+		double x1 = -1.0;
+		double y1 = m*x1+b;
+		double x2 = 1.0;
+		double y2 = m*x2+b;
+		double value = (x2 - x1)*(c.getY() - y1) - (y2 - y1)*(c.getX() - x1);
 		
-		//Draw base of candle
-		OGL.gl.glColor3d(0.965, 0.946, 0.883);
-		OGL.gl.glPushMatrix();
-		OGL.gl.glTranslated(x, y, 0.0);
-		glu.gluCylinder(quad, 0.0013f, 0.0013f, 0.025f, 5, 5);
-		OGL.gl.glPopMatrix();
-		
-		//Reset color
-		OGL.gl.glColor3f(1.0f, 1.0f, 1.0f);
-		
-		//
-		double wind = 0.0;
-		if(option == 0)
-			wind = 0.0;
-		else if(option == 1)
-			wind = -0.0003;
+		if(value >= 0)
+			return false;
 		else
-			wind = 0.0003;
-		
-		//Enable fire texture
-		fireTexture.enable(OGL.gl);
-		fireTexture.bind(OGL.gl);
-		
-		//Draw flame of candle (pyramid)
-		OGL.gl.glColor3d(0.996, 0.663, 0.235);
-		OGL.gl.glBegin(GL2.GL_TRIANGLES);
-		
-		//front side
-		OGL.gl.glTexCoord3d(0,1,0);
-		OGL.gl.glVertex3d(-0.0007+x,0.0007+y,0.026);
-		OGL.gl.glTexCoord3d(0,0,1);
-		OGL.gl.glVertex3d(wind+x,y,0.031);
-		OGL.gl.glTexCoord3d(1,0,0);
-		OGL.gl.glVertex3d(0.0007+x,0.0007+y,0.026);
-		
-		//left side
-		OGL.gl.glTexCoord3d(0,1,0);
-		OGL.gl.glVertex3d(-0.0007+x,-0.0007+y,0.026);
-		OGL.gl.glTexCoord3d(0,0,1);
-		OGL.gl.glVertex3d(wind+x,y,0.031);
-		OGL.gl.glTexCoord3d(1,0,0);
-		OGL.gl.glVertex3d(-0.0007+x,0.0007+y,0.026);
-		
-		//right side
-		OGL.gl.glTexCoord3d(0,1,0);
-		OGL.gl.glVertex3d(0.0007+x,-0.0007+y,0.026);
-		OGL.gl.glTexCoord3d(0,0,1);
-		OGL.gl.glVertex3d(wind+x,y,0.031);
-		OGL.gl.glTexCoord3d(1,0,0);
-		OGL.gl.glVertex3d(0.0007+x,0.0007+y,0.026);
-		
-		//back side
-		OGL.gl.glTexCoord3d(0,1,0);
-		OGL.gl.glVertex3d(-0.0007+x,-0.0007+y,0.026);
-		OGL.gl.glTexCoord3d(0,0,1);
-		OGL.gl.glVertex3d(wind+x,y,0.031);
-		OGL.gl.glTexCoord3d(1,0,0);
-		OGL.gl.glVertex3d(0.0007+x,-0.0007+y,0.026);
-		
-		OGL.gl.glEnd();
-
-		//Draw flame of candle (sphere)
-		OGL.gl.glPushMatrix();
-		OGL.gl.glTranslatef((float)x, (float)y, 0.026f);
-		OGL.gl.glScalef(1.0f, 1.0f, 2.0f);
-		glu.gluSphere(quad2, 0.0009, 5, 5);		
-		OGL.gl.glPopMatrix();
-		
-		//Disable the fire texture
-		fireTexture.disable(OGL.gl);
-				
-		
-		if (option == 0)
-		{
-			OGL.gl.glColor4f(1.0f, 0.49f, 0.176f, 0.12f);
-			OGL.gl.glPushMatrix();
-			OGL.gl.glTranslatef((float)x, (float)y, 0.029f);
-			OGL.gl.glScalef(1.0f, 1.0f, 2.0f);
-			glu.gluSphere(quad, 0.0030, 5, 5);		
-			OGL.gl.glPopMatrix();
-			
-			OGL.gl.glColor4f(1.0f, 0.49f, 0.176f, 0.08f);
-			OGL.gl.glPushMatrix();
-			OGL.gl.glTranslatef((float)x, (float)y, 0.029f);
-			OGL.gl.glScalef(1.0f, 1.0f, 2.0f);
-			glu.gluSphere(quad, 0.0060, 5, 5);		
-			OGL.gl.glPopMatrix();
-			
-			OGL.gl.glColor4f(1.0f, 0.49f, 0.176f, 0.04f);
-			OGL.gl.glPushMatrix();
-			OGL.gl.glTranslatef((float)x, (float)y, 0.029f);
-			OGL.gl.glScalef(1.0f, 1.0f, 2.0f);
-			glu.gluSphere(quad, 0.0080, 5, 5);
-			OGL.gl.glPopMatrix();
-		}
-		else if (option == 1)
-		{	
-			OGL.gl.glColor4f(1.0f, 0.49f, 0.176f, 0.12f);
-			OGL.gl.glPushMatrix();
-			OGL.gl.glTranslatef((float)x, (float)y, 0.029f);
-			OGL.gl.glScalef(1.0f, 1.0f, 2.0f);
-			glu.gluSphere(quad, 0.0060, 5, 5);		
-			OGL.gl.glPopMatrix();
-			
-			OGL.gl.glColor4f(1.0f, 0.49f, 0.176f, 0.08f);
-			OGL.gl.glPushMatrix();
-			OGL.gl.glTranslatef((float)x, (float)y, 0.029f);
-			OGL.gl.glScalef(1.0f, 1.0f, 2.0f);
-			glu.gluSphere(quad, 0.0080, 5, 5);
-			OGL.gl.glPopMatrix();
-		}
-		else
-		{
-			OGL.gl.glColor4f(1.0f, 0.49f, 0.176f, 0.12f);
-			OGL.gl.glPushMatrix();
-			OGL.gl.glTranslatef((float)x, (float)y, 0.029f);
-			OGL.gl.glScalef(1.0f, 1.0f, 2.0f);
-			glu.gluSphere(quad, 0.0080, 5, 5);
-			OGL.gl.glPopMatrix();
-		}
+			return true;
 	}
 	
 	public static void drawDimmer(GLU glu, Camera camera){

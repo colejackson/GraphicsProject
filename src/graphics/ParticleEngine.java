@@ -1,12 +1,9 @@
 package graphics;
 
+import graphics.Orb;
 import graphics.Particle;
 
-import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.glu.GLU;
-
-import graphics.Orb;
-
 
 public class ParticleEngine {
 	int numParticles = 75;
