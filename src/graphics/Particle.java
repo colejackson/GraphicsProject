@@ -46,7 +46,7 @@ public class Particle {
 		glu.gluSphere(quad, radius, 10, 10);
 		
 		OGL.gl.glPopMatrix();
-		//glu.gluDeleteQuadric(quad);
+		glu.gluDeleteQuadric(quad);
 
 	}
 	

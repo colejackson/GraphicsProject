@@ -53,6 +53,10 @@ public class Wall extends ArrayList<Side>
 		}
 				
 		this.stream().forEach(c -> c.glDraw());
+		
+		//Done, so disable these textures
+		materials[0].getTexture().disable(OGL.gl);
+		materials[1].getTexture().disable(OGL.gl);
 	}
 	
 	public Point2D.Double center()

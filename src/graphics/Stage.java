@@ -191,18 +191,23 @@ public class Stage implements GLEventListener
 
 		Scenery.drawGround();
 		Scenery.drawSky();
+		
+		//draw walls
 		draw.stream().sorted((x,y) -> Integer.compare(x.getTexIndx(), y.getTexIndx())).forEach(c -> c.glDraw());
 		
 		Scenery.drawCandles(glu);
 		
-		//Scenery.drawDimmer(glu, camera);
-		
+		//draw orbs
 		orb.drawOrb(glu);
 		partEng.update(orb, glu, camera);
 		
-		tractor.draw();
 		//for(LightBall lb : balls)
 			//lb.draw();
+		
+		//draw light beam
+		tractor.draw();
+		
+		//Scenery.drawDimmer(glu, camera);
 	}
 	
 	public void setBuffer(ArrayList<Wall> al)

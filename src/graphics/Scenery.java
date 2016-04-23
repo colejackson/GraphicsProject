@@ -25,6 +25,7 @@ public abstract class Scenery
 	private static Texture groundTexture;
 	private static Texture skyTexture;
 	private static Texture fireTexture;
+	private static Texture goldTexture;
 	
 	//Candle info
 	private final static int MAX_NUM_CANDLES = 500;
@@ -48,6 +49,7 @@ public abstract class Scenery
 		groundTexture = createTexture("ImagesGround/grassystone.jpg");
 		skyTexture = createTexture("ImagesSky/skyNight2.jpg");
 		fireTexture = createTexture("ImagesOther/fire.jpg");
+		goldTexture = createTexture("ImagesOther/gold.png");
 	}
 	
 	public static int getCandleCount()
@@ -272,6 +274,7 @@ public abstract class Scenery
 			candles[i].drawBase(glu);
 			candles[i].drawFlame(glu, fireTexture, wind[i]);
 			candles[i].drawFlicker(glu, flicker[i]);
+			candles[i].drawStand(glu, goldTexture);
 			//}
 		}
 		
@@ -298,10 +301,8 @@ public abstract class Scenery
 			return true;
 	}
 	
-	public static void drawDimmer(GLU glu, Camera camera){
-		OGL.gl.glEnable(GL.GL_BLEND);
-		OGL.gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
-		
+	public static void drawDimmer(GLU glu, Camera camera)
+	{
 		OGL.gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		OGL.gl.glColor4f(0.0f, 0.0f, 0.0f, camera.getAlpha());
 	
@@ -321,10 +322,6 @@ public abstract class Scenery
 		glu.gluCylinder(quad, 0.002f, 0.002f, 0.3f, 32, 1);
 		
 		OGL.gl.glPopMatrix();
-
-	
-		OGL.gl.glDisable(GL.GL_BLEND);
-	
 	}
 	
 //	public static float drawOrbs(GLU glu, float start){

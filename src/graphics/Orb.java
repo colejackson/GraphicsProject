@@ -39,7 +39,7 @@ public class Orb {
 		
 		OGL.gl.glPopMatrix();
 		
-		//glu.gluDeleteQuadric(quad);
+		glu.gluDeleteQuadric(quad);
 		
 		position[0] += movement;
 		//position[1] += movement;
