@@ -14,7 +14,7 @@ public class Particle {
 	public float[] color = new float[4];
 	boolean left;
 	
-	float life;
+	public float life;
 	
 	public Particle(){
 		position[0] = 0.0f;
@@ -32,10 +32,10 @@ public class Particle {
 			left = true;
 		}
 	}
-	
-	public void update(GLU glu, Camera camera){
+
+	public void update(GLU glu, Camera camera, Orb orb){
 		GLUquadric quad = glu.gluNewQuadric();
-		glu.gluQuadricNormals(quad, glu.GLU_SMOOTH);   // Create Smooth Normals ( NEW )
+		glu.gluQuadricNormals(quad, GLU.GLU_SMOOTH);   // Create Smooth Normals ( NEW )
 		glu.gluQuadricTexture(quad, false); 
 		
 		OGL.gl.glColor4f(color[0], color[1], color[2], color[3]);
@@ -44,6 +44,23 @@ public class Particle {
 		OGL.gl.glTranslatef(position[0], position[1], position[2]);
 		OGL.gl.glScalef(1, 1, 2);
 		glu.gluSphere(quad, radius, 10, 10);
+		
+		OGL.gl.glPopMatrix();
+		glu.gluDeleteQuadric(quad);
+
+	}
+	
+	public void update(GLU glu, Camera camera, Candle candle){
+		GLUquadric quad = glu.gluNewQuadric();
+		glu.gluQuadricNormals(quad, GLU.GLU_SMOOTH);   // Create Smooth Normals ( NEW )
+		glu.gluQuadricTexture(quad, false); 
+		
+		OGL.gl.glColor4f(color[0], color[1], color[2], color[3]);
+		OGL.gl.glPushMatrix();
+		
+		OGL.gl.glTranslatef(position[0], position[1], position[2]);
+		OGL.gl.glScalef(1, 1, 3);
+		glu.gluSphere(quad, 0.0009f, 10, 10);
 		
 		OGL.gl.glPopMatrix();
 		glu.gluDeleteQuadric(quad);

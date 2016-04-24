@@ -1,12 +1,12 @@
 package graphics;
 
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.Random;
 
 import javax.imageio.ImageIO;
 
-import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.glu.GLU;
@@ -16,6 +16,7 @@ import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
 
 import driver.OGL;
+import driver.Utilities;
 import objects.Candle;
 
 public abstract class Scenery 
@@ -31,6 +32,7 @@ public abstract class Scenery
 	//Candle info
 	private final static int MAX_NUM_CANDLES = 500;
 	private static Candle[] candles = new Candle[MAX_NUM_CANDLES];
+	private static ParticleEngine[] wax = new ParticleEngine[MAX_NUM_CANDLES];
 	private static int candleCount = 0;
 	
 	//Used by candle methods
@@ -71,6 +73,8 @@ public abstract class Scenery
 		//Candle candle = new Candle((.90*camera.getPosition()[0] + .10*camera.getLook()[0]), (.90*camera.getPosition()[1] + .10*camera.getLook()[1]));
 		Candle candle = new Candle(camera.getPosition()[0], camera.getPosition()[1]);
 		candles[candleCount] = candle;
+		ParticleEngine engine = new ParticleEngine(7, 0.008f);
+		wax[candleCount] = engine;
 		++candleCount;
 	}
 	
@@ -186,74 +190,6 @@ public abstract class Scenery
 		
 		skyTexture.disable(OGL.gl);
 	}
-	
-//	public static void drawCylinder(double x, double y)
-//	{
-//
-//		// "All walls are half the walls", so only draw the first three walls.
-//		for(int i = 0; i < 3; i++)
-//		{	
-//			// Draw all the values in the preprocessed array.
-//			for(double[] da : buffer.get(i))
-//			{	
-//				if (counter % 5 == 0)
-//				{
-//					if (counter % 30 == 0)
-//						wallTexture = wallTexture2;
-//					else
-//						wallTexture = wallTexture1;
-//				}
-//				
-//				wallTexture.enable(gl);
-//				wallTexture.bind(gl);
-//				
-//				// Draw a single wall.
-//				gl.glBegin(GL2.GL_POLYGON);
-//					
-//				//Sides of wall
-//				if(da.length < 7)
-//				{	
-//					gl.glColor3f(.7f, .7f, .7f);			//darken the image a little
-//					gl.glTexCoord2d(0,0);
-//					gl.glVertex3d(da[2], da[3], da[5]);
-//					
-//					gl.glColor3f(1.0f, 1.0f, 1.0f);			//lighten the image a little
-//					gl.glTexCoord2d(0,1);
-//					gl.glVertex3d(da[2], da[3], da[4]);
-//					
-//					gl.glTexCoord2d(1,1);
-//					gl.glVertex3d(da[0], da[1], da[4]);
-//					
-//					gl.glColor3f(.7f, .7f, .7f);			//darken the image a little
-//					gl.glTexCoord2d(1,0);
-//					gl.glVertex3d(da[0], da[1], da[5]);
-//				}
-//				//Top of wall
-//				else
-//				{
-//					gl.glColor3f(.7f, .7f, .7f);			//darken the image a little
-//					gl.glTexCoord2d(0,0);
-//					gl.glVertex3d(da[0], da[1], da[8]);
-//					
-//					gl.glColor3f(1.0f, 1.0f, 1.0f);			//lighten the image a little
-//					gl.glTexCoord2d(0,1);
-//					gl.glVertex3d(da[2], da[3], da[8]);
-//						
-//					gl.glTexCoord2d(1,1);
-//					gl.glVertex3d(da[4], da[5], da[8]);
-//					
-//					gl.glColor3f(.7f, .7f, .7f);			//darken the image a little
-//					gl.glTexCoord2d(1,0);
-//					gl.glVertex3d(da[6], da[7], da[8]);
-//				}
-//				
-//				gl.glEnd();
-//					
-//				++counter;
-//			}
-//		}
-//		wallTexture.disable(gl);
-//	}
 
 	
 	public static void drawCandles(GLU glu)
@@ -268,38 +204,53 @@ public abstract class Scenery
 			drawCounter = 0;
 		}
 		
+		double[] angles = new double[2];
+		
+		if(candleCount > 0)
+			angles = findBounds();
+		
 		for(int i = 0; i < candleCount; ++i)
 		{
-			//if(inFront(candles[i]))
-			//{
-			candles[i].drawBase(glu);
-			candles[i].drawFlame(glu, fireTexture, wind[i]);
-			candles[i].drawFlicker(glu, flicker[i]);
-			candles[i].drawStand(glu, goldTexture);
-			//}
+			if(inFront(candles[i], angles[0], angles[1]))
+			{
+				candles[i].drawBase(glu);
+				wax[i].update(candles[i], glu, camera);
+				candles[i].drawFlame(glu, fireTexture, wind[i]);
+				candles[i].drawFlicker(glu, flicker[i]);
+				candles[i].drawStand(glu, goldTexture);
+			}
 		}
 		
 		++drawCounter;	
 	}
 	
-	//Not working right yet, 
-	//but trying to only draw candles in front of camera and not behind to improve performance even more
-	public static boolean inFront(Candle c)
+	public static double[] findBounds()
 	{
-		//Find slope of line between camera position and look
-		double slope = (camera.getLook()[1] - camera.getPosition()[1])/(camera.getLook()[0] - camera.getPosition()[0]);
-		double m = -1.0/slope;
-		double b = camera.getPosition()[1] - (camera.getPosition()[0]*m);
-		double x1 = -1.0;
-		double y1 = m*x1+b;
-		double x2 = 1.0;
-		double y2 = m*x2+b;
-		double value = (x2 - x1)*(c.getY() - y1) - (y2 - y1)*(c.getX() - x1);
+		double[] angles = new double[2];
 		
-		if(value >= 0)
-			return false;
-		else
+		Point2D.Double origin = new Point2D.Double(camera.getPosition()[0], camera.getPosition()[1]);
+		Point2D.Double look = new Point2D.Double(camera.getLook()[0], camera.getLook()[1]);
+		double checkAngle = Utilities.getAngle(origin, look) + 360.0;
+		
+		double angleRightBound = checkAngle - 35.0;
+		double angleLeftBound = checkAngle + 35.0;
+		
+		angles[0] = angleRightBound;
+		angles[1] = angleLeftBound;
+		
+		return angles;
+	}
+	
+	public  static boolean inFront(Candle candle, double angleRight, double angleLeft)
+	{
+		Point2D.Double origin = new Point2D.Double(camera.getPosition()[0], camera.getPosition()[1]);
+		Point2D.Double location = new Point2D.Double(candle.getX(), candle.getY());
+		double angle = Utilities.getAngle(origin, location) + 360.0;
+		
+		if (angle >= angleRight && angle <= angleLeft)
 			return true;
+		else
+			return false;
 	}
 	
 	public static void drawDimmer(GLU glu, Camera camera)
@@ -324,33 +275,6 @@ public abstract class Scenery
 		
 		OGL.gl.glPopMatrix();
 	}
-	
-//	public static float drawOrbs(GLU glu, float start){
-//		
-//		// Ball o light
-//		
-//		//gl.glColor3f(0.3f, 0.6f, 0.3f);
-//		OGL.gl.glColor3f(1.0f, 1.0f, 1.0f);
-//		
-//		OGL.gl.glPushMatrix();
-//
-//		GLUquadric quad = glu.gluNewQuadric();
-//		glu.gluQuadricNormals(quad, GLU.GLU_SMOOTH);   // Create Smooth Normals ( NEW )
-//		glu.gluQuadricTexture(quad, false); 
-//
-//		OGL.gl.glTranslatef(0.02f, 0.02f, 0.0f + start);
-//		OGL.gl.glScalef(1.0f, 1.0f, 2.0f);
-//		
-//		glu.gluSphere(quad, 0.04, 15, 15);		
-//		
-//		OGL.gl.glPopMatrix();
-//		
-//		start *= 1.001f;
-//		
-//		return start;
-//		// end ball o light
-//	}
-	
 
 	public static Texture createTexture(String imagePath)
 	{	

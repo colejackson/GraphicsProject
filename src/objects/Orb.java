@@ -5,13 +5,11 @@ import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.glu.GLUquadric;
 
 import driver.OGL;
-import graphics.ParticleEngine;
 
 public class Orb {
 	
 	public float[] color = new float[3];
 	float movement = 0.001f;
-	ParticleEngine pEngine = new ParticleEngine();
 	public float[] position = new float[3];
 	
 	public Orb(){
@@ -29,7 +27,7 @@ public class Orb {
 		OGL.gl.glPushMatrix();
 
 		GLUquadric quad = glu.gluNewQuadric();
-		glu.gluQuadricNormals(quad, glu.GLU_SMOOTH);   // Create Smooth Normals ( NEW )
+		glu.gluQuadricNormals(quad, GLU.GLU_SMOOTH);   // Create Smooth Normals ( NEW )
 		glu.gluQuadricTexture(quad, false); 
 
 		OGL.gl.glTranslatef(position[0], position[1], position[2]);
