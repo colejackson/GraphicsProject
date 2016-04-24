@@ -126,8 +126,8 @@ public class Stage implements GLEventListener
 		
 		tractor = new TractorBeam(0.0, 0.0);
 		balls = new ArrayList<>();
-		for(int i = 0; i < 1; i++)
-			balls.add(new LightBall(0.0,0.0));
+		for(int i = 0; i < 5; i++)
+			balls.add(new LightBall(-0.917,-0.896));
 		
 		// Initialize variables except camera which requires the GL2 object be initialized first.
 		this.wpp = new WallPreprocessor(maze);

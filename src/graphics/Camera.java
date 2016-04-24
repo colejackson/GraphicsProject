@@ -51,8 +51,11 @@ public class Camera
 		init();
 		
 		// Set initial position
-		posX = 0.0;
-		posY = 0.98;
+		//posX = 0.0;
+		//posY = 0.98;
+		
+		posX = -.917;
+		posY = -.896;
 		posZ = 0.13;
 		
 		// Set initial look

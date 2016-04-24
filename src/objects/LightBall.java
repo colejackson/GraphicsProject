@@ -28,8 +28,8 @@ public class LightBall extends Double
 	{
 		super(x,y);
 		
-		angle = Math.random() * 360;
-		speed = .00018;
+		angle = Math.random() * 360.0;
+		speed = .00054;
 		radius = .01;
 	}
 	
@@ -40,7 +40,7 @@ public class LightBall extends Double
 	
 	public void setAngle(double d)
 	{
-		angle = d % 360;
+		angle = d % 360.0;
 	}
 	
 	public double getAngle()
@@ -83,14 +83,16 @@ public class LightBall extends Double
 		
 		OGL.glu.gluSphere(quad, radius, 32, 32);
 		
-		OGL.gl.glPopMatrix();		
+		OGL.gl.glPopMatrix();
+		
+		OGL.glu.gluDeleteQuadric(quad);
 	}
 	
 	private void updateLoc()
 	{
-		double twoPi = Math.PI * 2;
-		double newX = Math.cos(twoPi*(angle/360))*speed + getX();
-		double newY = Math.sin(twoPi*(angle/360))*speed + getY();
+		double twoPi = Math.PI * 2.0;
+		double newX = Math.cos(twoPi*(angle/360.0))*speed + getX();
+		double newY = Math.sin(twoPi*(angle/360.0))*speed + getY();
 		
 		if(willCollide(newX, newY))
 		{
@@ -110,18 +112,18 @@ public class LightBall extends Double
 			for(Side s : w)
 			{
 				
-				if(!s.isTop && new Line2D.Double(getX(), getY(), x, y).intersectsLine(new Line2D.Double(s.x1, s.y1, s.x2, s.y2)));
+				if(!s.isTop && new Line2D.Double(getX(), getY(), x, y).intersectsLine(new Line2D.Double(s.x1, s.y1, s.x2, s.y2)))
 				{
-					double reverse = ((Utilities.getAngle(this, new Point2D.Double(x, y)) + 180.0) % 360.0) + 360.0;
+					double reverse = ((angle + 180.0) % 360.0) + 360.0;
 					double normal = ((Utilities.getAngle(new Point2D.Double(s.x1, s.y1), new Point2D.Double(s.x2, s.y2)) + 90.0) % 360.0) + 360.0;
 					
 					if(Math.max(reverse, normal) - Math.min(reverse, normal) > 180.0)
 						normal = ((normal + 180.0) % 360.0) + 360.0;
 					
 					if(normal > reverse)
-						setAngle(angle + (2.0 * (normal - reverse)));
+						setAngle(reverse + (2.0 * (normal - reverse)));
 					else
-						setAngle(angle - (2.0 * (reverse - normal)));
+						setAngle(reverse - (2.0 * (reverse - normal)));
 					
 					return true;
 				}
