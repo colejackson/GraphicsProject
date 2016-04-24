@@ -21,6 +21,14 @@ public class TractorBeam
 		this.y = y;
 	}
 	
+	public double getX(){
+		return x;
+	}
+	
+	public double getY(){
+		return y;
+	}
+	
 	public void draw()
 	{
 		for(int i = 0; i < 64; i++)

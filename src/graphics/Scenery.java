@@ -260,7 +260,7 @@ public abstract class Scenery
 	
 		double[] pos = camera.getPosition();
 		
-		OGL.gl.glColor4f(0.0f, 0.0f, 0.0f, camera.getAlpha());
+		OGL.gl.glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
 	
 		OGL.gl.glPushMatrix();
 

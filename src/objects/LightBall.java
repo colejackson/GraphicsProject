@@ -15,8 +15,10 @@ import maze.Wall;
 
 public class LightBall extends Double 
 {
+	public float color[] = new float[4];
+	
 	private static final long serialVersionUID = 2011551764811644298L;
-
+	
 	private double angle;
 	private double speed;
 	private double radius;
@@ -25,8 +27,12 @@ public class LightBall extends Double
 	private ArrayList<Wall> oldBuffer = null;
 	
 	public LightBall(double x, double y)
-	{
+	{	
 		super(x,y);
+		
+		for(int i = 0; i < 3; i++){
+			color[i] = (float)Math.random()*0.5f + 0.5f;
+		}
 		
 		angle = Math.random() * 360.0;
 		speed = .00054;
@@ -70,7 +76,7 @@ public class LightBall extends Double
 	{
 		updateLoc();
 		
-		OGL.gl.glColor3f(0.3f, 0.6f, 0.3f);
+		OGL.gl.glColor3f(color[0], color[1], color[2]);
 		
 		OGL.gl.glPushMatrix();
 
