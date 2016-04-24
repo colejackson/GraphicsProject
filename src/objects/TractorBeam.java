@@ -21,6 +21,14 @@ public class TractorBeam
 		this.y = y;
 	}
 	
+	public double getX(){
+		return x;
+	}
+	
+	public double getY(){
+		return y;
+	}
+	
 	public void draw()
 	{
 		for(int i = 0; i < 64; i++)
@@ -38,11 +46,11 @@ public class TractorBeam
 				
 				OGL.gl.glColor4d(color, 1.0, color, .5);
 				
-				OGL.gl.glVertex3d(((Math.cos(angle1)*0.03 + x)),((Math.sin(angle1)*0.03) + y), (d + 1.0)/60.0);
+				OGL.gl.glVertex3d(((Math.cos(angle1)*0.03 + x)),((Math.sin(angle1)*0.03) + y), (d * 3.0)/60.0);
 				
 				OGL.gl.glColor4d(color, color, 1.0, .5);
 				
-				OGL.gl.glVertex3d(((Math.cos(angle2)*0.03 + x)),((Math.sin(angle2)*0.03) + y), (d + 1.0)/60.0);
+				OGL.gl.glVertex3d(((Math.cos(angle2)*0.03 + x)),((Math.sin(angle2)*0.03) + y), (d * 3.0)/60.0);
 				
 				OGL.gl.glColor4d(color, color, color, .5);
 				

@@ -4,7 +4,11 @@ import java.awt.geom.Point2D;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+<<<<<<< HEAD
 import java.util.Random;
+=======
+import java.util.concurrent.ExecutorService;
+>>>>>>> master
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
@@ -56,10 +60,13 @@ public class Stage implements GLEventListener
 	
 	// Objects in the Maze
 	private TractorBeam tractor;
+<<<<<<< HEAD
 	private Texture orbTexture;
+=======
+	private ParticleEngine tractorEngine;
+>>>>>>> master
 	private ArrayList<LightBall> balls;
-	private ParticleEngine orbPartEng;
-	private Orb orb;
+	private ArrayList<ParticleEngine> engines;
 	
 	float start = 0.2f;
 
@@ -129,7 +136,18 @@ public class Stage implements GLEventListener
 			e.printStackTrace();
 		}
 		
+<<<<<<< HEAD
 		balls = new ArrayList<>();
+=======
+		tractor = new TractorBeam(0.0, 0.0);
+		tractorEngine = new ParticleEngine(50, 0.01f);
+		engines = new ArrayList<>();
+		balls = new ArrayList<>();
+		for(int i = 0; i < 5; i++){
+			balls.add(new LightBall(-0.917,-0.896));
+			engines.add(new ParticleEngine(25, 0.015f));
+		}
+>>>>>>> master
 		
 		// Initialize variables except camera which requires the GL2 object be initialized first.
 		this.wpp = new WallPreprocessor(maze);
@@ -146,6 +164,7 @@ public class Stage implements GLEventListener
 		//Enable transparency
 		gl.glEnable(GL.GL_BLEND);
 		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+<<<<<<< HEAD
 		
 		
 		
@@ -221,6 +240,9 @@ public class Stage implements GLEventListener
 		
 		orb = new Orb();
 		orbPartEng = new ParticleEngine(75, 0.008f);
+=======
+		// Create a Camera and pass in the gl objects.
+>>>>>>> master
 		
 		// Initialize the scenery
 		Scenery.initTextures();
@@ -271,16 +293,23 @@ public class Stage implements GLEventListener
 		//Scenery.drawCandles(glu);
 		
 		//draw orbs
-		orb.drawOrb(glu);
-		orbPartEng.update(orb, glu, camera);
 		
+<<<<<<< HEAD
 		for(LightBall lb : balls)
 		{
 			lb.draw(orbTexture);
+=======
+		for(int i = 0; i < balls.size(); i++){
+			balls.get(i).draw();
+			engines.get(i).update(balls.get(i), glu, camera);
+>>>>>>> master
 		}
 		
+		
 		//draw light beam
-		//tractor.draw();
+		tractorEngine.update(tractor, glu, camera);
+
+		tractor.draw();
 		
 		//Scenery.drawDimmer(glu, camera);
 	}
