@@ -79,13 +79,9 @@ public class LightBall extends Double
 	{
 		updateLoc();
 		
-<<<<<<< HEAD
 		OGL.gl.glColor3f(1.0f, 1.0f, 1.0f);
 		orbTexture.enable(OGL.gl);
 		orbTexture.bind(OGL.gl);
-=======
-		OGL.gl.glColor3f(color[0], color[1], color[2]);
->>>>>>> master
 		
 		OGL.gl.glPushMatrix();
 
