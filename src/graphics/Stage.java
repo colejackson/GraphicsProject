@@ -209,10 +209,8 @@ public class Stage implements GLEventListener
 		
 		
 		//draw light beam
-<<<<<<< HEAD
 		tractorEngine.update(tractor, glu, camera);
-=======
->>>>>>> master
+
 		tractor.draw();
 		
 		//Scenery.drawDimmer(glu, camera);
