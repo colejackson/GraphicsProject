@@ -3,6 +3,7 @@ package graphics;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
@@ -149,8 +150,6 @@ public class Stage implements GLEventListener
 		gl.glEnable(GL.GL_BLEND);
 		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 		// Create a Camera and pass in the gl objects.
-		this.camera = new Camera();
-		
 		
 		// Initialize the scenery
 		Scenery.initTextures();
