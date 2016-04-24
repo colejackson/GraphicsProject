@@ -6,6 +6,8 @@ import driver.OGL;
 
 public class TractorBeam 
 {
+	private boolean isMoving = true;
+	
 	private double x;
 	private double y;
 	
@@ -19,6 +21,7 @@ public class TractorBeam
 	{
 		this.x = x;
 		this.y = y;
+		this.isMoving = true;
 	}
 	
 	public double getX(){
@@ -71,11 +74,19 @@ public class TractorBeam
 			
 			OGL.gl.glEnd();
 			
-			this.x = Math.sin(4 * t)* .33;
-			this.y = Math.sin(5 * t) * .33;
-			
-			t = ((t + .000003) % (Math.PI * 2));
-		}	
+			if(isMoving)
+			{
+				this.x = Math.sin(4 * t)* .33;
+				this.y = Math.sin(5 * t) * .33;
+				
+				t = ((t + .000003) % (Math.PI * 2));
+			}
+		}
+	}
+	
+	public void setMoving(boolean b)
+	{
+		isMoving = b;
 	}
 	
 }

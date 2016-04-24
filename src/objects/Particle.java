@@ -33,12 +33,14 @@ public class Particle {
 		}
 	}
 
-	public void update(GLU glu, Camera camera, LightBall ball){
+	public void update(GLU glu, Camera camera, LightBall ball)
+	{
 		GLUquadric quad = glu.gluNewQuadric();
 		glu.gluQuadricNormals(quad, GLU.GLU_SMOOTH);   // Create Smooth Normals ( NEW )
 		glu.gluQuadricTexture(quad, false); 
 		
-		OGL.gl.glColor4f(color[0], color[1], color[2], color[3]);
+		//OGL.gl.glColor4f(color[0], color[1], color[2], color[3]);
+		OGL.gl.glColor4f((float)(245.0/255.0), (float)(175.0/255.0), (float)(47.0/255.0), color[3]);
 		OGL.gl.glPushMatrix();
 		
 		OGL.gl.glTranslatef(position[0], position[1], position[2]);
@@ -47,10 +49,10 @@ public class Particle {
 		
 		OGL.gl.glPopMatrix();
 		glu.gluDeleteQuadric(quad);
-
 	}
 	
-	public void update(GLU glu, Camera camera, Candle candle){
+	public void update(GLU glu, Camera camera, Candle candle)
+	{
 		GLUquadric quad = glu.gluNewQuadric();
 		glu.gluQuadricNormals(quad, GLU.GLU_SMOOTH);   // Create Smooth Normals ( NEW )
 		glu.gluQuadricTexture(quad, false); 
@@ -64,7 +66,6 @@ public class Particle {
 		
 		OGL.gl.glPopMatrix();
 		glu.gluDeleteQuadric(quad);
-
 	}
 	
 	public void update(GLU glu, Camera camera, TractorBeam beam){

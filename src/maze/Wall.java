@@ -18,10 +18,10 @@ public class Wall extends ArrayList<Side>
 	
 	static
 	{
-		materials = new Material[1];
+		materials = new Material[2];
 		
 		materials[0] = new Material(Scenery.createTexture("ImagesWall/concrete.jpg"), null);
-		//materials[1] = new Material(Scenery.createTexture("ImagesWall/metal1dark.jpg"), null);
+		materials[1] = new Material(Scenery.createTexture("ImagesWall/metal1dark.jpg"), null);
 		//materials[2] = new Material(Scenery.createTexture("ImagesWall/hedge.png"), null);
 	}
 	

@@ -64,26 +64,26 @@ public class Director extends ArrayList<String>implements KeyListener
 			this.remove(PIVOT_RGT);
 			this.add(PIVOT_RGT);
 		}
-		if(k.getKeyCode() == KeyEvent.VK_W)
-		{
-			this.remove(ZOOM_OUT);
-			this.add(ZOOM_OUT);
-		}
-		if(k.getKeyCode() == KeyEvent.VK_S)
-		{
-			this.remove(ZOOM_IN);
-			this.add(ZOOM_IN);
-		}
-		if(k.getKeyCode() == KeyEvent.VK_2)
-		{
-			this.remove(ALPHA_UP);
-			this.add(ALPHA_UP);
-		}
-		if(k.getKeyCode() == KeyEvent.VK_1)
-		{
-			this.remove(ALPHA_DOWN);
-			this.add(ALPHA_DOWN);
-		}
+//		if(k.getKeyCode() == KeyEvent.VK_W)
+//		{
+//			this.remove(ZOOM_OUT);
+//			this.add(ZOOM_OUT);
+//		}
+//		if(k.getKeyCode() == KeyEvent.VK_S)
+//		{
+//			this.remove(ZOOM_IN);
+//			this.add(ZOOM_IN);
+//		}
+//		if(k.getKeyCode() == KeyEvent.VK_2)
+//		{
+//			this.remove(ALPHA_UP);
+//			this.add(ALPHA_UP);
+//		}
+//		if(k.getKeyCode() == KeyEvent.VK_1)
+//		{
+//			this.remove(ALPHA_DOWN);
+//			this.add(ALPHA_DOWN);
+//		}
 		if(k.getKeyCode() == KeyEvent.VK_C)
 		{
 			Scenery.addCandle();
@@ -92,29 +92,29 @@ public class Director extends ArrayList<String>implements KeyListener
 		{
 			Scenery.removeCandle();
 		}
-		if(k.getKeyCode() == KeyEvent.VK_X)
-		{
-			this.remove(UP);
-			this.add(UP);
-		}
-		if(k.getKeyCode() == KeyEvent.VK_Z)
-		{
-			this.remove(DOWN);
-			this.add(DOWN);
-		}
+//		if(k.getKeyCode() == KeyEvent.VK_X)
+//		{
+//			this.remove(UP);
+//			this.add(UP);
+//		}
+//		if(k.getKeyCode() == KeyEvent.VK_Z)
+//		{
+//			this.remove(DOWN);
+//			this.add(DOWN);
+//		}
 	}
 
 	@Override
 	public void keyReleased(KeyEvent k) 
 	{
-		if(k.getKeyCode() == KeyEvent.VK_2)
-		{
-			this.remove(ALPHA_UP);
-		}
-		if(k.getKeyCode() == KeyEvent.VK_1)
-		{
-			this.remove(ALPHA_DOWN);
-		}
+//		if(k.getKeyCode() == KeyEvent.VK_2)
+//		{
+//			this.remove(ALPHA_UP);
+//		}
+//		if(k.getKeyCode() == KeyEvent.VK_1)
+//		{
+//			this.remove(ALPHA_DOWN);
+//		}
 		if(k.getKeyCode() == KeyEvent.VK_DOWN)
 		{
 			this.remove(MOVE_BACK);
@@ -131,22 +131,22 @@ public class Director extends ArrayList<String>implements KeyListener
 		{
 			this.remove(PIVOT_RGT);
 		}
-		if(k.getKeyCode() == KeyEvent.VK_W)
-		{
-			this.remove(ZOOM_OUT);
-		}
-		if(k.getKeyCode() == KeyEvent.VK_S)
-		{
-			this.remove(ZOOM_IN);
-		}
-		if(k.getKeyCode() == KeyEvent.VK_X)
-		{
-			this.remove(UP);
-		}
-		if(k.getKeyCode() == KeyEvent.VK_Z)
-		{
-			this.remove(DOWN);
-		}
+//		if(k.getKeyCode() == KeyEvent.VK_W)
+//		{
+//			this.remove(ZOOM_OUT);
+//		}
+//		if(k.getKeyCode() == KeyEvent.VK_S)
+//		{
+//			this.remove(ZOOM_IN);
+//		}
+//		if(k.getKeyCode() == KeyEvent.VK_X)
+//		{
+//			this.remove(UP);
+//		}
+//		if(k.getKeyCode() == KeyEvent.VK_Z)
+//		{
+//			this.remove(DOWN);
+//		}
 	}
 	
 	@Override

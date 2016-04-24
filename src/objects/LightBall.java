@@ -19,12 +19,16 @@ public class LightBall extends Double
 	public float color[] = new float[4];
 	
 	private static final long serialVersionUID = 2011551764811644298L;
-	
+		
 	private double angle;
 	private double speed;
 	private double radius;
 	
+	private boolean active = false;
+	
 	private double rotate = 0;
+	
+	private Wall lastHit = null;
 	
 	private ArrayList<Wall> buffer = null;
 	private ArrayList<Wall> oldBuffer = null;
@@ -38,7 +42,7 @@ public class LightBall extends Double
 		}
 		
 		angle = Math.random() * 360.0;
-		speed = .00054;
+		speed = .0029;
 		radius = .01;
 	}
 	
@@ -77,6 +81,9 @@ public class LightBall extends Double
 	
 	public void draw(Texture orbTexture)
 	{
+		if(!active)
+			return;
+		
 		updateLoc();
 		
 		OGL.gl.glColor3f(1.0f, 1.0f, 1.0f);
@@ -117,6 +124,16 @@ public class LightBall extends Double
 		rotate = (rotate + .01) % (Math.PI * 2.0);
 	}
 	
+	public void setActive(boolean b)
+	{
+		active = b;
+	}
+	
+	public boolean getActive()
+	{
+		return active;
+	}
+	
 	private boolean willCollide(double x, double y)
 	{		
 		if(buffer == null)
@@ -144,8 +161,10 @@ public class LightBall extends Double
 				for(Side s : w)
 				{
 					
-					if(!s.isTop && new Line2D.Double(current, next).intersectsLine(new Line2D.Double(s.x1, s.y1, s.x2, s.y2)))
+					if(!s.isTop && new Line2D.Double(current, next).intersectsLine(new Line2D.Double(s.x1, s.y1, s.x2, s.y2)) && w != lastHit)
 					{
+						lastHit = w;
+						
 						double reverse = ((angle + 180.0) % 360.0) + 360.0;
 						double normal = ((Utilities.getAngle(new Point2D.Double(s.x1, s.y1), new Point2D.Double(s.x2, s.y2)) + 90.0) % 360.0) + 360.0;
 						
@@ -153,9 +172,9 @@ public class LightBall extends Double
 							normal = ((normal + 180.0) % 360.0) + 360.0;
 						
 						if(normal > reverse)
-							setAngle(reverse + (2.0 * (normal - reverse)));
+							setAngle((reverse + (2.0 * (normal - reverse))) + ((Math.random() * .2) - .1));
 						else
-							setAngle(reverse - (2.0 * (reverse - normal)));
+							setAngle(reverse - (2.0 * (reverse - normal)) + ((Math.random() * .2) - .1));
 						
 						return true;
 					}
