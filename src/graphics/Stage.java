@@ -144,6 +144,9 @@ public class Stage implements GLEventListener
 		//Enable transparency
 		gl.glEnable(GL.GL_BLEND);
 		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+		// Create a Camera and pass in the gl objects.
+		this.camera = new Camera();
+		
 		
 		orb = new Orb();
 		orbPartEng = new ParticleEngine(75, 0.008f);
