@@ -53,12 +53,12 @@ public class Camera
 		// Set initial position
 		posX = 0.0;
 		posY = 0.98;
-		posZ = 0.1;
+		posZ = 0.13;
 		
 		// Set initial look
 		lookX = 0.0;
 		lookY = -0.02;
-		lookZ = 0.14;
+		lookZ = 0.13;
 		
 		// Set initial up vector
 		upX = 0.0;

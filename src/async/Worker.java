@@ -95,10 +95,9 @@ public class Worker
 			
 			for(Wall w : wpp)
 			{
-				Point2D.Double avg = w.center();
-				double distance = Utilities.distance(avg.getX(), avg.getY(), lb.getX(), lb.getY());
+				double distance = w.center().distance(lb);
 
-				if(distance < .03)
+				if(distance < .0)
 				{
 					balls.add(w);
 				}

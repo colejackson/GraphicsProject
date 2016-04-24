@@ -1,4 +1,4 @@
-package graphics;
+package objects;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.glu.GLU;
@@ -30,7 +30,7 @@ public class Candle
 
 	public void drawBase(GLU glu)
 	{
-		double z = 0.000;
+		double z = 0.009;
 		
 		GLUquadric quad = glu.gluNewQuadric();
 		glu.gluQuadricTexture(quad, false);
@@ -47,7 +47,7 @@ public class Candle
 	
 	public void drawFlame(GLU glu, Texture fireTexture, double wind)
 	{
-		double z = 0.026;
+		double z = 0.035;
 		
 		//Enable fire texture
 		fireTexture.enable(OGL.gl);
@@ -111,7 +111,7 @@ public class Candle
 	
 	public void drawFlicker(GLU glu, int flicker)
 	{
-		double z = 0.029;
+		double z = 0.038;
 		
 		GLUquadric quad3 = glu.gluNewQuadric();
 		glu.gluQuadricTexture(quad3, false);
@@ -183,32 +183,32 @@ public class Candle
 		//OGL.gl.glColor4f(0.827f, 0.776f, 0.302f, 1.0f);
 		OGL.gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		
-		//Stand design 1
-		OGL.gl.glPushMatrix();
-		OGL.gl.glTranslated(x, y, 0.0);
-		glu.gluCylinder(quad4, 0.002f, 0.0035f, 0.0035f, 7, 7);
-		OGL.gl.glPopMatrix();
-		
-		OGL.gl.glPushMatrix();
-		OGL.gl.glTranslated(x, y, 0.001);
-		glu.gluDisk(quad4, 0.0, 0.0022, 7, 7);
-		OGL.gl.glPopMatrix();
+//		//Stand design 1
+//		OGL.gl.glPushMatrix();
+//		OGL.gl.glTranslated(x, y, 0.0);
+//		glu.gluCylinder(quad4, 0.002f, 0.0035f, 0.0035f, 7, 7);
+//		OGL.gl.glPopMatrix();
+//		
+//		OGL.gl.glPushMatrix();
+//		OGL.gl.glTranslated(x, y, 0.001);
+//		glu.gluDisk(quad4, 0.0, 0.0022, 7, 7);
+//		OGL.gl.glPopMatrix();
 		
 		//Stand design 2
-//		OGL.gl.glPushMatrix();
-//		OGL.gl.glTranslated(x, y, 0.0);
-//		glu.gluCylinder(quad4, 0.0005f, 0.0035f, 0.003f, 7, 7);
-//		OGL.gl.glPopMatrix();
-//		
-//		OGL.gl.glPushMatrix();
-//		OGL.gl.glTranslated(x, y, 0.0);
-//		glu.gluCylinder(quad4, 0.0005f, 0.0005f, 0.009f, 7, 7);
-//		OGL.gl.glPopMatrix();
-//		
-//		OGL.gl.glPushMatrix();
-//		OGL.gl.glTranslated(x, y, 0.009);
-//		glu.gluDisk(quad4, 0.0, 0.002, 7, 7);
-//		OGL.gl.glPopMatrix();
+		OGL.gl.glPushMatrix();
+		OGL.gl.glTranslated(x, y, 0.0);
+		glu.gluCylinder(quad4, 0.0005f, 0.0035f, 0.003f, 7, 7);
+		OGL.gl.glPopMatrix();
+		
+		OGL.gl.glPushMatrix();
+		OGL.gl.glTranslated(x, y, 0.0);
+		glu.gluCylinder(quad4, 0.0005f, 0.0005f, 0.009f, 7, 7);
+		OGL.gl.glPopMatrix();
+		
+		OGL.gl.glPushMatrix();
+		OGL.gl.glTranslated(x, y, 0.009);
+		glu.gluDisk(quad4, 0.0, 0.002, 7, 7);
+		OGL.gl.glPopMatrix();
 		
 		//Stand design 3
 //		OGL.gl.glPushMatrix();

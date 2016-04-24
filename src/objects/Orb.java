@@ -1,19 +1,18 @@
-package graphics;
+package objects;
 
-
-import driver.OGL;
 
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.glu.GLUquadric;
 
+import driver.OGL;
 import graphics.ParticleEngine;
 
 public class Orb {
 	
-	float[] color = new float[3];
+	public float[] color = new float[3];
 	float movement = 0.001f;
 	ParticleEngine pEngine = new ParticleEngine();
-	float[] position = new float[3];
+	public float[] position = new float[3];
 	
 	public Orb(){
 		for(int i = 0; i < 3; i++){

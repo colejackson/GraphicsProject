@@ -1,7 +1,7 @@
 package graphics;
 
-import graphics.Orb;
-import graphics.Particle;
+import objects.Orb;
+import objects.Particle;
 
 import com.jogamp.opengl.glu.GLU;
 

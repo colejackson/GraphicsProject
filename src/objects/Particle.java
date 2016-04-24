@@ -1,17 +1,17 @@
-package graphics;
+package objects;
 
-import com.jogamp.opengl.GL;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.glu.GLUquadric;
 
 import driver.OGL;
+import graphics.Camera;
 
 public class Particle {
-	float[] position = new float[3];
+	public float[] position = new float[3];
 	float velocityx = 0.001f;
 	float velocityy = 0.000f;
 	float radius;
-	float[] color = new float[4];
+	public float[] color = new float[4];
 	boolean left;
 	
 	float life;
@@ -33,7 +33,7 @@ public class Particle {
 		}
 	}
 	
-	protected void update(GLU glu, Camera camera){
+	public void update(GLU glu, Camera camera){
 		GLUquadric quad = glu.gluNewQuadric();
 		glu.gluQuadricNormals(quad, glu.GLU_SMOOTH);   // Create Smooth Normals ( NEW )
 		glu.gluQuadricTexture(quad, false); 
@@ -50,21 +50,21 @@ public class Particle {
 
 	}
 	
-	protected void setLife(float decay){
+	public void setLife(float decay){
 		life = life - decay;
 		color[3] = color[3] - 3 * decay;
 	}
 	
-	protected void newLife(){
+	public void newLife(){
 		// Random life makes it trail off much nicer
 		life = (float)Math.random();
 	}
 	
-	protected float getLife(){
+	public float getLife(){
 		return life;
 	}
 	
-	protected void move(int count){
+	public void move(int count){
 		if(left){
 			//position[0] += velocityy * Math.random() * 0.0005f;
 			position[1] += velocityx * Math.random() * 0.0005f;

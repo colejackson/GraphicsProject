@@ -13,7 +13,6 @@ public class Wall extends ArrayList<Side>
 	
 	private static int lastTexture = -1;
 
-	
 	private static Material[] materials = null;
 	private int texIndx;
 	

@@ -22,8 +22,8 @@ import maze.Maze;
 import maze.Wall;
 import maze.WallPreprocessor;
 import objects.LightBall;
+import objects.Orb;
 import objects.TractorBeam;
-import graphics.Orb;
 import graphics.ParticleEngine;
 
 public class Stage implements GLEventListener
@@ -127,7 +127,7 @@ public class Stage implements GLEventListener
 		
 		tractor = new TractorBeam(0.0, 0.0);
 		balls = new ArrayList<>();
-		for(int i = 0; i < 5; i++)
+		for(int i = 0; i < 1; i++)
 			balls.add(new LightBall(0.0,0.0));
 		
 		// Initialize variables except camera which requires the GL2 object be initialized first.
@@ -195,17 +195,19 @@ public class Stage implements GLEventListener
 		//draw walls
 		draw.stream().sorted((x,y) -> Integer.compare(x.getTexIndx(), y.getTexIndx())).forEach(c -> c.glDraw());
 		
-		Scenery.drawCandles(glu);
+		//Scenery.drawCandles(glu);
 		
 		//draw orbs
-		orb.drawOrb(glu);
-		partEng.update(orb, glu, camera);
+		//orb.drawOrb(glu);
+		//partEng.update(orb, glu, camera);
 		
-		//for(LightBall lb : balls)
-			//lb.draw();
+		for(LightBall lb : balls)
+		{
+			lb.draw();
+		}
 		
 		//draw light beam
-		tractor.draw();
+		//tractor.draw();
 		
 		//Scenery.drawDimmer(glu, camera);
 	}

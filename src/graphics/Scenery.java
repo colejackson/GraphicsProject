@@ -16,6 +16,7 @@ import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
 
 import driver.OGL;
+import objects.Candle;
 
 public abstract class Scenery 
 {	

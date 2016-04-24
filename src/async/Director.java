@@ -30,10 +30,10 @@ public class Director extends ArrayList<String>implements KeyListener
 	 */
 	
 	// LIST OF FINAL COMMANDS
-	private final String MOVE_BACK = "f:-.005";
-	private final String MOVE_FORW = "f:.005";
-	private final String PIVOT_LFT = "r:-.7";
-	private final String PIVOT_RGT = "r:.7";
+	private final String MOVE_BACK = "f:-.003";
+	private final String MOVE_FORW = "f:.003";
+	private final String PIVOT_LFT = "r:-.4";
+	private final String PIVOT_RGT = "r:.4";
 	private final String ZOOM_OUT = "z:.02";
 	private final String ZOOM_IN = "z:-.02";
 	private final String ALPHA_UP = "a:-.005";

@@ -13,6 +13,7 @@ public class TractorBeam
 	private double factor = .02;
 	
 	private double rotate = 60000;
+	private double t = 0;
 	
 	public TractorBeam(double x, double y)
 	{
@@ -62,8 +63,10 @@ public class TractorBeam
 			
 			OGL.gl.glEnd();
 			
-			this.x += (.0002/60);
-			this.y += (.0002/60);
+			this.x = Math.sin(4 * t)* .33;
+			this.y = Math.sin(5 * t) * .33;
+			
+			t = ((t + .000003) % (Math.PI * 2));
 		}	
 	}
 	
