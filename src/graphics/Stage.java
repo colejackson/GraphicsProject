@@ -148,6 +148,9 @@ public class Stage implements GLEventListener
 		//Enable transparency
 		gl.glEnable(GL.GL_BLEND);
 		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+		// Create a Camera and pass in the gl objects.
+		this.camera = new Camera();
+		
 		
 		// Initialize the scenery
 		Scenery.initTextures();
@@ -206,7 +209,10 @@ public class Stage implements GLEventListener
 		
 		
 		//draw light beam
+<<<<<<< HEAD
 		tractorEngine.update(tractor, glu, camera);
+=======
+>>>>>>> master
 		tractor.draw();
 		
 		//Scenery.drawDimmer(glu, camera);
