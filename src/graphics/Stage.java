@@ -52,9 +52,9 @@ public class Stage implements GLEventListener
 	
 	// Objects in the Maze
 	private TractorBeam tractor;
+	private ParticleEngine tractorEngine;
 	private ArrayList<LightBall> balls;
-	private ParticleEngine orbPartEng;
-	private Orb orb;
+	private ArrayList<ParticleEngine> engines;
 	
 	float start = 0.2f;
 
@@ -125,9 +125,13 @@ public class Stage implements GLEventListener
 		}
 		
 		tractor = new TractorBeam(0.0, 0.0);
+		tractorEngine = new ParticleEngine(50, 0.01f);
+		engines = new ArrayList<>();
 		balls = new ArrayList<>();
-		for(int i = 0; i < 5; i++)
+		for(int i = 0; i < 5; i++){
 			balls.add(new LightBall(-0.917,-0.896));
+			engines.add(new ParticleEngine(25, 0.015f));
+		}
 		
 		// Initialize variables except camera which requires the GL2 object be initialized first.
 		this.wpp = new WallPreprocessor(maze);
@@ -147,9 +151,6 @@ public class Stage implements GLEventListener
 		// Create a Camera and pass in the gl objects.
 		this.camera = new Camera();
 		
-		
-		orb = new Orb();
-		orbPartEng = new ParticleEngine(75, 0.008f);
 		
 		// Initialize the scenery
 		Scenery.initTextures();
@@ -200,15 +201,18 @@ public class Stage implements GLEventListener
 		//Scenery.drawCandles(glu);
 		
 		//draw orbs
-		orb.drawOrb(glu);
-		orbPartEng.update(orb, glu, camera);
 		
-		for(LightBall lb : balls)
-		{
-			lb.draw();
+		for(int i = 0; i < balls.size(); i++){
+			balls.get(i).draw();
+			engines.get(i).update(balls.get(i), glu, camera);
 		}
 		
+		
 		//draw light beam
+<<<<<<< HEAD
+		tractorEngine.update(tractor, glu, camera);
+=======
+>>>>>>> master
 		tractor.draw();
 		
 		//Scenery.drawDimmer(glu, camera);
