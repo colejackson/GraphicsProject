@@ -97,7 +97,7 @@ public class Worker
 			{
 				double distance = w.center().distance(lb);
 
-				if(distance < .0)
+				if(distance < .05)
 				{
 					balls.add(w);
 				}

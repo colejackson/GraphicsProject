@@ -112,8 +112,8 @@ public class LightBall extends Double
 				
 				if(!s.isTop && new Line2D.Double(getX(), getY(), x, y).intersectsLine(new Line2D.Double(s.x1, s.y1, s.x2, s.y2)));
 				{
-					double reverse = ((Utilities.getAngle(this, new Point2D.Double(x, y)) + 180) % 360) + 360;
-					double normal = ((Utilities.getAngle(new Point2D.Double(s.x1, s.y1), new Point2D.Double(s.x2, s.y2)) + 90) % 360) + 360;
+					double reverse = ((Utilities.getAngle(this, new Point2D.Double(x, y)) + 180.0) % 360.0) + 360.0;
+					double normal = ((Utilities.getAngle(new Point2D.Double(s.x1, s.y1), new Point2D.Double(s.x2, s.y2)) + 90.0) % 360.0) + 360.0;
 					
 					if(Math.max(reverse, normal) - Math.min(reverse, normal) > 180.0)
 						normal = ((normal + 180.0) % 360.0) + 360.0;
