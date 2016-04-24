@@ -1,9 +1,14 @@
 package graphics;
 
+import java.awt.geom.Point2D;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+<<<<<<< HEAD
+import java.util.Random;
+=======
 import java.util.concurrent.ExecutorService;
+>>>>>>> master
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
@@ -15,10 +20,12 @@ import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.gl2.GLUT;
+import com.jogamp.opengl.util.texture.Texture;
 
 import async.Director;
 import async.Worker;
 import driver.OGL;
+import driver.Utilities;
 import maze.Maze;
 import maze.Wall;
 import maze.WallPreprocessor;
@@ -53,7 +60,11 @@ public class Stage implements GLEventListener
 	
 	// Objects in the Maze
 	private TractorBeam tractor;
+<<<<<<< HEAD
+	private Texture orbTexture;
+=======
 	private ParticleEngine tractorEngine;
+>>>>>>> master
 	private ArrayList<LightBall> balls;
 	private ArrayList<ParticleEngine> engines;
 	
@@ -125,6 +136,9 @@ public class Stage implements GLEventListener
 			e.printStackTrace();
 		}
 		
+<<<<<<< HEAD
+		balls = new ArrayList<>();
+=======
 		tractor = new TractorBeam(0.0, 0.0);
 		tractorEngine = new ParticleEngine(50, 0.01f);
 		engines = new ArrayList<>();
@@ -133,6 +147,7 @@ public class Stage implements GLEventListener
 			balls.add(new LightBall(-0.917,-0.896));
 			engines.add(new ParticleEngine(25, 0.015f));
 		}
+>>>>>>> master
 		
 		// Initialize variables except camera which requires the GL2 object be initialized first.
 		this.wpp = new WallPreprocessor(maze);
@@ -149,7 +164,85 @@ public class Stage implements GLEventListener
 		//Enable transparency
 		gl.glEnable(GL.GL_BLEND);
 		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+<<<<<<< HEAD
+		
+		
+		
+		//Randomize orb starting locations
+		int numberOfOrbs = 6;
+		Random rand = new Random();
+		Point2D.Double userPosition = new Point2D.Double(camera.getPosition()[0], camera.getPosition()[1]);
+		Point2D.Double[] orbPositions = new Point2D.Double[numberOfOrbs];
+		
+		for(int j=0; j<numberOfOrbs; ++j)
+		{
+			double x = rand.nextDouble();
+			double y = rand.nextDouble();
+			Point2D.Double location = new Point2D.Double(x, y);
+			
+			boolean awayFromUser = false;
+			boolean insideMaze = false;
+			boolean notInWall = false;
+			while(awayFromUser != true && insideMaze != true && notInWall != true)
+			{
+				//If coordinates are within certain distance of user's initial position, find new
+				double radius = 0.1;
+				double lhs = ((x-userPosition.getX())*(x-userPosition.getX())) + ((y-userPosition.getY())*(y-userPosition.getY()));
+				double rhs = radius*radius;
+				
+				if (lhs < rhs)
+					awayFromUser = false;
+				else
+					awayFromUser = true;
+				
+				
+				//If coordinates are outside of maze, find new
+				int numRows = maze.getRows();
+				System.out.println(maze.get(0, 0).getY());
+				
+				Point2D.Double vertex1 = new Point2D.Double(0/(double)numRows, -(0-((double)numRows)/2.0)/((double)numRows/2.0));
+				Point2D.Double vertex2 = new Point2D.Double(0/(double)numRows, -(((double)numRows)-((double)numRows)/2.0)/((double)numRows/2.0));
+				Point2D.Double vertex3 = new Point2D.Double(((double) Utilities.fooCount(numRows))/(double)numRows, -(((double)numRows)-((double)numRows)/2.0)/((double)numRows/2.0));
+				
+				
+				double angle1 = Utilities.getAngle(location, vertex1)+360.0;
+				double angle2 = Utilities.getAngle(location, vertex2)+360.0;
+				double angle3 = Utilities.getAngle(location, vertex3)+360.0;
+				
+				double value = (angle1-angle3)+(angle3-angle2)+(angle2-angle1);
+				
+				if (value <= 361 || value >= 359)
+					insideMaze = true;
+				else
+					insideMaze = false;
+				
+				
+				//If coordinates are in/on a wall, find new
+//				LightBall lightball = new LightBall(x, y);
+//				boolean collide = LightBall.willCollide(wpp, lightball);
+//				if(collide == true)
+//					notInWall = false;
+//				else
+//					notInWall = true;
+			}
+			
+			orbPositions[j] = location;
+		}
+		
+		for(int i = 0; i < numberOfOrbs; i++)
+			balls.add(new LightBall(orbPositions[i].getX(),orbPositions[i].getY()));
+		
+		
+		
+		
+		tractor = new TractorBeam(0.0, 0.0);
+		orbTexture = Scenery.createTexture("ImagesOther/fire.jpg");
+		
+		orb = new Orb();
+		orbPartEng = new ParticleEngine(75, 0.008f);
+=======
 		// Create a Camera and pass in the gl objects.
+>>>>>>> master
 		
 		// Initialize the scenery
 		Scenery.initTextures();
@@ -201,9 +294,15 @@ public class Stage implements GLEventListener
 		
 		//draw orbs
 		
+<<<<<<< HEAD
+		for(LightBall lb : balls)
+		{
+			lb.draw(orbTexture);
+=======
 		for(int i = 0; i < balls.size(); i++){
 			balls.get(i).draw();
 			engines.get(i).update(balls.get(i), glu, camera);
+>>>>>>> master
 		}
 		
 		

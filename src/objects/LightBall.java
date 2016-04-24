@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.glu.GLUquadric;
+import com.jogamp.opengl.util.texture.Texture;
 
 import driver.OGL;
 import driver.Utilities;
@@ -74,11 +75,17 @@ public class LightBall extends Double
 		return temp;
 	}
 	
-	public void draw()
+	public void draw(Texture orbTexture)
 	{
 		updateLoc();
 		
+<<<<<<< HEAD
+		OGL.gl.glColor3f(1.0f, 1.0f, 1.0f);
+		orbTexture.enable(OGL.gl);
+		orbTexture.bind(OGL.gl);
+=======
 		OGL.gl.glColor3f(color[0], color[1], color[2]);
+>>>>>>> master
 		
 		OGL.gl.glPushMatrix();
 
@@ -93,8 +100,9 @@ public class LightBall extends Double
 		OGL.glu.gluSphere(quad, radius, 32, 32);
 		
 		OGL.gl.glPopMatrix();
-		
+
 		OGL.glu.gluDeleteQuadric(quad);
+		orbTexture.disable(OGL.gl);
 	}
 	
 	private void updateLoc()
