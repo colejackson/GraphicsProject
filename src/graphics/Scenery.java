@@ -210,7 +210,6 @@ public abstract class Scenery
 		{
 			if(inFront(candles[i], angles[0], angles[1]))
 			{
-				System.out.println("Printing candle " + i);
 				candles[i].drawBase(glu);
 				candles[i].drawFlame(glu, fireTexture, wind[i]);
 				candles[i].drawFlicker(glu, flicker[i]);
@@ -219,11 +218,6 @@ public abstract class Scenery
 		}
 		
 		++drawCounter;	
-	}
-	
-	public static boolean shouldDraw(Point2D.Double position, Point2D.Double look, Point2D.Double candle)
-	{
-		return false;
 	}
 	
 	public static double[] findBounds()
