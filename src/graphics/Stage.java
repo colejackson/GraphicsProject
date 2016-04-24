@@ -54,7 +54,7 @@ public class Stage implements GLEventListener
 	// Objects in the Maze
 	private TractorBeam tractor;
 	private ArrayList<LightBall> balls;
-	private ParticleEngine partEng;
+	private ParticleEngine orbPartEng;
 	private Orb orb;
 	
 	float start = 0.2f;
@@ -147,7 +147,7 @@ public class Stage implements GLEventListener
 		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 		
 		orb = new Orb();
-		partEng = new ParticleEngine();
+		orbPartEng = new ParticleEngine(75, 0.008f);
 		
 		// Initialize the scenery
 		Scenery.initTextures();
@@ -199,7 +199,7 @@ public class Stage implements GLEventListener
 		
 		//draw orbs
 		orb.drawOrb(glu);
-		partEng.update(orb, glu, camera);
+		orbPartEng.update(orb, glu, camera);
 		
 		//for(LightBall lb : balls)
 			//lb.draw();

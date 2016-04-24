@@ -12,7 +12,6 @@ public class Orb {
 	
 	float[] color = new float[3];
 	float movement = 0.001f;
-	ParticleEngine pEngine = new ParticleEngine();
 	float[] position = new float[3];
 	
 	public Orb(){

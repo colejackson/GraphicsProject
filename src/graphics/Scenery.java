@@ -32,6 +32,7 @@ public abstract class Scenery
 	//Candle info
 	private final static int MAX_NUM_CANDLES = 500;
 	private static Candle[] candles = new Candle[MAX_NUM_CANDLES];
+	private static ParticleEngine[] wax = new ParticleEngine[MAX_NUM_CANDLES];
 	private static int candleCount = 0;
 	
 	//Used by candle methods
@@ -72,6 +73,8 @@ public abstract class Scenery
 		//Candle candle = new Candle((.90*camera.getPosition()[0] + .10*camera.getLook()[0]), (.90*camera.getPosition()[1] + .10*camera.getLook()[1]));
 		Candle candle = new Candle(camera.getPosition()[0], camera.getPosition()[1]);
 		candles[candleCount] = candle;
+		ParticleEngine engine = new ParticleEngine(7, 0.008f);
+		wax[candleCount] = engine;
 		++candleCount;
 	}
 	
@@ -211,6 +214,7 @@ public abstract class Scenery
 			if(inFront(candles[i], angles[0], angles[1]))
 			{
 				candles[i].drawBase(glu);
+				wax[i].update(candles[i], glu, camera);
 				candles[i].drawFlame(glu, fireTexture, wind[i]);
 				candles[i].drawFlicker(glu, flicker[i]);
 				candles[i].drawStand(glu, goldTexture);
