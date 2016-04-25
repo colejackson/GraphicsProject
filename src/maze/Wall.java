@@ -3,10 +3,10 @@ package maze;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
-
 import driver.OGL;
 import graphics.Scenery;
 
+//Wall object
 public class Wall extends ArrayList<Side> 
 {
 	private static final long serialVersionUID = -8790194530751762795L;
@@ -36,8 +36,10 @@ public class Wall extends ArrayList<Side>
 		Arrays.stream(sides).forEach(c -> this.add(c));
 	}
 	
+	//Draw the wall
 	public void glDraw()
 	{	
+		//Set the texture
 		if(lastTexture == -1)
 		{
 			materials[texIndx].getTexture().enable(OGL.gl);
@@ -55,9 +57,10 @@ public class Wall extends ArrayList<Side>
 		
 		//Done, so disable these textures
 		materials[0].getTexture().disable(OGL.gl);
-		//materials[1].getTexture().disable(OGL.gl);
+		materials[1].getTexture().disable(OGL.gl);
 	}
 	
+	//Return the center point of the wall
 	public Point2D.Double center()
 	{
 		return this.stream().filter(p -> p.isTop).findFirst().get().center();
@@ -66,5 +69,4 @@ public class Wall extends ArrayList<Side>
 	public int getTexIndx() {
 		return texIndx;
 	}
-	
 }

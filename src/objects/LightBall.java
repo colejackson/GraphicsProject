@@ -14,6 +14,7 @@ import driver.Utilities;
 import maze.Side;
 import maze.Wall;
 
+//Traveling spheres
 public class LightBall extends Double 
 {
 	public float color[] = new float[4];
@@ -23,10 +24,10 @@ public class LightBall extends Double
 	private double angle;
 	private double speed;
 	private double radius;
-	
-	private boolean active = false;
-	
 	private double rotate = 0;
+	
+	//If it's being displayed or not
+	private boolean active = false;
 	
 	private Wall lastHit = null;
 	
@@ -37,7 +38,8 @@ public class LightBall extends Double
 	{	
 		super(x,y);
 		
-		for(int i = 0; i < 3; i++){
+		for(int i = 0; i < 3; i++)
+		{
 			color[i] = (float)Math.random()*0.5f + 0.5f;
 		}
 		
@@ -46,11 +48,13 @@ public class LightBall extends Double
 		radius = .01;
 	}
 	
+	//Change the speed of the ball
 	public void changeSpeed(double d)
 	{
 		speed *= d;
 	}
 	
+	//Change the angle of the ball
 	public void setAngle(double d)
 	{
 		angle = d % 360.0;
@@ -61,6 +65,7 @@ public class LightBall extends Double
 		return angle;
 	}
 	
+	//Set the buffer
 	public void setBuffer(ArrayList<Wall> buffer)
 	{
 		this.oldBuffer = this.buffer;
@@ -79,6 +84,7 @@ public class LightBall extends Double
 		return temp;
 	}
 	
+	//Draw the sphere
 	public void draw(Texture orbTexture)
 	{
 		if(!active)
@@ -108,6 +114,7 @@ public class LightBall extends Double
 		orbTexture.disable(OGL.gl);
 	}
 	
+	//Update the new location of the sphere
 	private void updateLoc()
 	{
 		double twoPi = Math.PI * 2.0;
@@ -115,15 +122,14 @@ public class LightBall extends Double
 		double newY = Math.sin(twoPi*(angle/360.0))*speed + getY();
 		
 		if(willCollide(newX, newY))
-		{
 			return;
-		}
 		
 		this.setLocation(newX, newY);
 		
 		rotate = (rotate + .01) % (Math.PI * 2.0);
 	}
 	
+	//Set the sphere to be active so it will be displayed
 	public void setActive(boolean b)
 	{
 		active = b;
@@ -134,6 +140,7 @@ public class LightBall extends Double
 		return active;
 	}
 	
+	//Tells if sphere will collide with a wall or not
 	private boolean willCollide(double x, double y)
 	{		
 		if(buffer == null)
@@ -146,6 +153,7 @@ public class LightBall extends Double
 		Point2D.Double next = new Point2D.Double();
 		double twoPi = Math.PI * 2.0;
 		
+		//Want to check points on side of sphere and not the center point for collision
 		double sides = 32.0;
 		for(int i = 0; i < sides; i++)
 		{
@@ -160,7 +168,6 @@ public class LightBall extends Double
 			{
 				for(Side s : w)
 				{
-					
 					if(!s.isTop && new Line2D.Double(current, next).intersectsLine(new Line2D.Double(s.x1, s.y1, s.x2, s.y2)) && w != lastHit)
 					{
 						lastHit = w;

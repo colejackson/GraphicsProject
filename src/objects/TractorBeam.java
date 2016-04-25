@@ -4,6 +4,7 @@ import com.jogamp.opengl.GL2;
 
 import driver.OGL;
 
+//Colored tunnel that is the goal the user's trying to get to
 public class TractorBeam 
 {
 	private boolean isMoving = true;
@@ -17,6 +18,7 @@ public class TractorBeam
 	private double rotate = 60000;
 	private double t = 0;
 	
+	//Create a moving tractor beam at the location
 	public TractorBeam(double x, double y)
 	{
 		this.x = x;
@@ -32,6 +34,8 @@ public class TractorBeam
 		return y;
 	}
 	
+	
+	//Draw the tractor beam
 	public void draw()
 	{
 		for(int i = 0; i < 64; i++)
@@ -74,6 +78,7 @@ public class TractorBeam
 			
 			OGL.gl.glEnd();
 			
+			//If moving, update the location
 			if(isMoving)
 			{
 				this.x = Math.sin(4 * t)* .33;
@@ -88,5 +93,4 @@ public class TractorBeam
 	{
 		isMoving = b;
 	}
-	
 }

@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import graphics.Scenery;
 
 /* 
- * The Director is a special arraylist that will contain directions for the camera async.  
- * The class consistes of event listeners that add commands to the array and remove them 
+ * The Director is a special array list that will contain directions for the camera async.  
+ * The class consists of event listeners that add commands to the array and remove them 
  * when a button is released.  The result is a sort of bulletin board that tells the camera
  * how to behave at every refresh.
  */
@@ -19,7 +19,7 @@ public class Director extends ArrayList<String>implements KeyListener
 	/*
 	 * General procedure: when a key is pressed, make sure the command
 	 * isn't already in the array by removing it, this will happen when a
-	 * button is held or something werid happens with multiple keyboards.
+	 * button is held or something weird happens with multiple keyboards.
 	 * 
 	 * Next add the command to the array when the key is pressed, make sure
 	 * the command change the camera the correct amount for a SINGLE FRAME
@@ -34,12 +34,12 @@ public class Director extends ArrayList<String>implements KeyListener
 	private final String MOVE_FORW = "f:.003";
 	private final String PIVOT_LFT = "r:-.4";
 	private final String PIVOT_RGT = "r:.4";
-	private final String ZOOM_OUT = "z:.02";
-	private final String ZOOM_IN = "z:-.02";
-	private final String ALPHA_UP = "a:-.005";
-	private final String ALPHA_DOWN = "a:.005";
-	private final String UP = "u:.02";
-	private final String DOWN = "u:-.02";
+	//private final String ZOOM_OUT = "z:.02";
+	//private final String ZOOM_IN = "z:-.02";
+	//private final String ALPHA_UP = "a:-.005";
+	//private final String ALPHA_DOWN = "a:.005";
+	//private final String UP = "u:.02";
+	//private final String DOWN = "u:-.02";
 		
 	@Override
 	public void keyPressed(KeyEvent k) 

@@ -38,6 +38,7 @@ public class Stage implements GLEventListener
 	private GLCapabilities capabilities;;
 	private GLCanvas canvas;
 	
+	//Buffer of walls and all walls
 	private ArrayList<Wall> buffer = null;
 	private ArrayList<Wall> draw = null;
 			
@@ -59,7 +60,6 @@ public class Stage implements GLEventListener
 	private ArrayList<LightBall> balls;
 	private ArrayList<ParticleEngine> engines;
 	
-	float start = 0.2f;
 	
 	/////////// SCRIPT //////////////
 	HashMap<String, Boolean> script = new HashMap<String, Boolean>();
@@ -71,7 +71,7 @@ public class Stage implements GLEventListener
 		this.maze = maze;
 		this.stage = this;
 		
-		// Initialize the varibales to set the frame.
+		// Initialize the variables to set the frame.
 		this.director = new Director();
 		this.profile = GLProfile.getDefault();
 		this.capabilities = new GLCapabilities(profile);
@@ -87,6 +87,7 @@ public class Stage implements GLEventListener
 		FPSAnimator	animator = new FPSAnimator(canvas, 60);
 		animator.start();
 		
+		/////////// SCRIPT //////////////
 		script.put("shade", false);
 		script.put("lightball", true);
 		script.put("beamOn", false);
@@ -137,9 +138,11 @@ public class Stage implements GLEventListener
 			e.printStackTrace();
 		}
 		
-
+		//Create a tractor and it's particle engine
 		tractor = new TractorBeam(0.0, 0.0);
 		tractorEngine = new ParticleEngine(50, 0.01f);
+		
+		//Create an array of balls and an array of engines used by each ball
 		engines = new ArrayList<>();
 		balls = new ArrayList<>();
 		
@@ -159,6 +162,7 @@ public class Stage implements GLEventListener
 		gl.glEnable(GL.GL_BLEND);
 		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 
+		//Add the light balls to the array of balls and add a particle engine for each of them
 		balls.add(new LightBall(.00916, -.05544));
 		engines.add(new ParticleEngine(25, 0.015f));
 		balls.add(new LightBall(.583839, -.59799));
@@ -170,14 +174,10 @@ public class Stage implements GLEventListener
 		balls.add(new LightBall(.3058, .3270));
 		engines.add(new ParticleEngine(25, 0.015f));		
 		
+		//Create the tractor beam
 		tractor = new TractorBeam(0.0, 0.0);
-		orbTexture = Scenery.createTexture("ImagesOther/fire.jpg");
 		
-		//orb = new Orb();
-		//orbPartEng = new ParticleEngine(75, 0.008f);
-
-		// Create a Camera and pass in the gl objects.
-
+		orbTexture = Scenery.createTexture("ImagesOther/fire.jpg");
 		
 		// Initialize the scenery
 		Scenery.initTextures();
@@ -199,17 +199,14 @@ public class Stage implements GLEventListener
 	//Render the scene on the OpenGL Canvas
 	private void render(GLAutoDrawable glad)
 	{	
-		
 		/////////////////////// SCRIPTING CODE ////////////////////////////
-		
+		//If a light ball has been captured, remove it
 		int j = 0;
 		int rem = -1;
 		for(LightBall lb : balls)
 		{
 			if(new Point2D.Double(camera.getPosition()[0], camera.getPosition()[1]).distance(lb) < .02)
-			{
 				rem = j;
-			}
 			j++;
 		}
 		
@@ -219,25 +216,33 @@ public class Stage implements GLEventListener
 			engines.remove(rem);
 		}
 		
+		//If the game has ended, exit
 		if(script.get("end"))
 			System.exit(0);
+		
+		//If the z value has increased, the game has ended, so set this variable to true
 		if(camera.getPosition()[2] >= 2)
 			script.put("end", true);
 		
+		//If the size of the ball array is less than 5, one has been captured, so they should stop being displayed
 		if(balls.size() < 5)
 		{
 			script.put("lightball", false);
 		}
 		
+		//If the light balls are not being displayed, turn the tractor beam on and set it to move
 		if(!script.get("lightball"))
 		{
 			script.put("beamOn", true);
 			script.put("beamMoving", true);
 		}
 		
+		//If the beam is on and the user is within it
 		if(script.get("beamOn") && (camera.getPosition()[0] - tractor.getX()) < .02 && (camera.getPosition()[0] - tractor.getX()) > -.02 && (camera.getPosition()[1] - tractor.getY()) < .02 && (camera.getPosition()[1] - tractor.getY()) > -.02)
 		{
+			//Set movement to false
 			script.put("beamMoving", false);
+			//Automatically raise user up through the tunnel to exit
 			this.director = new Director();
 			director.remove("u:.005");
 			director.add("u:.005");
@@ -247,22 +252,20 @@ public class Stage implements GLEventListener
 			buffer = wpp;
 		}
 		
+		//If the beam is not moving, set this in the tractor beam class
 		if(!script.get("beamMoving"))
 			tractor.setMoving(false);
 		
-		
 		/////////////////////// END SCRIPTING ////////////////////////////////
 		
+		
+		//If the lightball is within a certain distance of the user, then set it to active
 		for(LightBall b : balls)
 		{
 			if((new Point2D.Double(camera.getPosition()[0], camera.getPosition()[1]).distance(b) < .5))
-			{
 				b.setActive(true);
-			}
 			else
-			{
 				b.setActive(false);
-			}
 		}
 		
 		// Check for commands from the director and pass them to the camera.
@@ -285,16 +288,17 @@ public class Stage implements GLEventListener
 			draw = buffer;
 		}	
 
+		//Draw the ground and sky
 		Scenery.drawGround();
 		Scenery.drawSky();
 		
-		//draw walls
+		//Draw the walls
 		draw.stream().sorted((x,y) -> Integer.compare(x.getTexIndx(), y.getTexIndx())).forEach(c -> c.glDraw());
 		
+		//Draw the candles
 		Scenery.drawCandles(glu);
 		
-		//draw orbs
-		
+		//Draw the orbs and their particles
 		if(script.get("lightball"))
 		{
 			for(int i = 0; i < balls.size(); i++)
@@ -307,14 +311,14 @@ public class Stage implements GLEventListener
 			}
 		}
 		
-		
-		//draw light beam
+		//Draw light beam
 		if(script.get("beamOn"))
 		{
 			tractorEngine.update(tractor, glu, camera);
 			tractor.draw();
 		}
 		
+		//Draw the dimmer
 		//Scenery.drawDimmer(glu, camera);
 	}
 	
