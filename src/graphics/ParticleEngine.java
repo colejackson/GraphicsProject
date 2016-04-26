@@ -4,7 +4,6 @@ import com.jogamp.opengl.glu.GLU;
 
 import objects.Candle;
 import objects.LightBall;
-import objects.Orb;
 import objects.Particle;
 import objects.TractorBeam;
 

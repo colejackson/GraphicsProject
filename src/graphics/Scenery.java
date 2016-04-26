@@ -284,9 +284,15 @@ public abstract class Scenery
 			URL textureURL;
 			textureURL = Scenery.class.getResource(imagePath);
 			
+			if(textureURL == null)
+			{
+				textureURL = Scenery.class.getClassLoader().getResource("/src/graphics/" + imagePath);
+			}
+			
 			if (textureURL != null)
 			{
-				BufferedImage img = ImageIO.read(textureURL);
+				BufferedImage img = ImageIO.read(new URL(textureURL.toExternalForm()));
+				
 				ImageUtil.flipImageVertically(img);
 				texture = AWTTextureIO.newTexture(GLProfile.getDefault(), img, true);
 				texture.setTexParameteri(OGL.gl, GL2.GL_TEXTURE_WRAP_S, GL2.GL_REPEAT);
